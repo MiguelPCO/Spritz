@@ -1,0 +1,196 @@
+<style>
+*{box-sizing:border-box;margin:0}
+body{font-family:'DM Sans',system-ui,sans-serif;background:#FBF8F4;color:#2D2926;padding:32px 24px}
+h1{font-family:'Plus Jakarta Sans',system-ui;font-size:28px;font-weight:600;letter-spacing:-.5px;margin:0 0 6px}
+.sub{font-size:14px;color:#A39E94;margin:0 0 32px}
+.flow{margin:0 0 36px}
+.flow-title{font-family:'Plus Jakarta Sans',system-ui;font-size:18px;font-weight:600;margin:0 0 4px;display:flex;align-items:center;gap:10px}
+.flow-tag{font-size:11px;font-weight:500;padding:3px 10px;border-radius:999px;letter-spacing:.04em}
+.flow-desc{font-size:13px;color:#6B6760;margin:0 0 16px}
+.steps{display:flex;gap:0;align-items:flex-start;overflow-x:auto;padding:8px 0 16px}
+.step{min-width:140px;max-width:160px;flex-shrink:0;text-align:center;position:relative}
+.step-box{padding:12px 10px;border-radius:14px;margin:0 0 6px;font-size:12px;font-weight:500;line-height:1.3;min-height:52px;display:flex;align-items:center;justify-content:center}
+.step-note{font-size:11px;color:#A39E94;line-height:1.3;padding:0 4px}
+.arrow{display:flex;align-items:center;justify-content:center;min-width:28px;flex-shrink:0;color:#D6D0C5;font-size:18px;padding-top:14px}
+.branch{margin:10px 0 0 20px;border-left:2px solid #E5E2DB;padding:0 0 0 14px}
+.branch-item{font-size:12px;color:#6B6760;padding:6px 0;position:relative;line-height:1.4}
+.branch-item::before{content:'';position:absolute;left:-15px;top:13px;width:10px;height:1.5px;background:#E5E2DB}
+.branch-action{font-weight:500;color:#2D2926}
+.s-primary{background:#FAEAE5;color:#993C1D}
+.s-teal{background:#E3F3F0;color:#0F6E56}
+.s-violet{background:#EEEAFC;color:#3C3489}
+.s-gold{background:#FBF3E0;color:#854F0B}
+.s-rose{background:#FBEDF1;color:#72243E}
+.s-dark{background:#2D2926;color:#F0EBE3}
+.s-cream{background:#F0EBE3;color:#6B6760}
+.screen-map{margin:40px 0 0}
+.screen-map h2{font-family:'Plus Jakarta Sans',system-ui;font-size:20px;font-weight:600;margin:0 0 16px}
+.screens{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.screen{border-radius:14px;padding:14px;text-align:center}
+.screen-name{font-size:13px;font-weight:600;margin:0 0 4px}
+.screen-desc{font-size:11px;line-height:1.4}
+.priority{display:inline-flex;padding:2px 6px;border-radius:4px;font-size:10px;font-weight:500;margin:0 0 6px}
+.p1{background:#FAEAE5;color:#993C1D}
+.p2{background:#FBF3E0;color:#854F0B}
+.p3{background:#F0EBE3;color:#6B6760}
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 32px;font-size:12px;color:#6B6760}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:12px;height:12px;border-radius:4px}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+
+<h1>spritz<span style="color:#E85D3A">.</span> user flows</h1>
+<p class="sub">Referencia para construir pantallas en Figma — 5 flows principales</p>
+
+<div class="legend">
+<div class="legend-item"><div class="legend-dot s-dark"></div> Entry point</div>
+<div class="legend-item"><div class="legend-dot s-primary"></div> Core action</div>
+<div class="legend-item"><div class="legend-dot s-teal"></div> Success / confirm</div>
+<div class="legend-item"><div class="legend-dot s-cream"></div> Screen / view</div>
+<div class="legend-item"><div class="legend-dot s-violet"></div> AI / smart</div>
+<div class="legend-item"><div class="legend-dot s-gold"></div> Secondary</div>
+</div>
+
+<div class="flow">
+<div class="flow-title">Flow 1: recomendación diaria <span class="flow-tag s-primary">Core loop</span></div>
+<div class="flow-desc">El motivo principal por el que el usuario abre la app cada mañana</div>
+<div class="steps">
+<div class="step"><div class="step-box s-dark">Abrir app</div><div class="step-note">Entry point diario</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-violet">AI analiza contexto</div><div class="step-note">Clima + hora + historial + colección</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-primary">Today's Pick</div><div class="step-note">Recomendación + razón + foto frasco</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-teal">Usar hoy</div><div class="step-note">1 tap para registrar</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-teal">Confirmación</div><div class="step-note">Animación spray + log guardado</div></div>
+</div>
+<div class="branch">
+<div class="branch-item">Desde Today's Pick: <span class="branch-action">[Otra opción]</span> &rarr; Nueva recomendación (mismos factores)</div>
+<div class="branch-item">Desde Today's Pick: <span class="branch-action">[Cambiar ocasión]</span> &rarr; Selector (trabajo, cita, casual, formal) &rarr; Nueva rec</div>
+<div class="branch-item">Desde Today's Pick: <span class="branch-action">[Tap en fragancia]</span> &rarr; Fragrance Detail screen</div>
+</div>
+</div>
+
+<div class="flow">
+<div class="flow-title">Flow 2: explorar colección <span class="flow-tag s-gold">Daily use</span></div>
+<div class="flow-desc">Navegar y gestionar las fragancias que ya tiene el usuario</div>
+<div class="steps">
+<div class="step"><div class="step-box s-dark">Tab Wardrobe</div><div class="step-note">Bottom nav</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Grid colección</div><div class="step-note">Cards compact en 2 cols + search + filtros</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Fragrance detail</div><div class="step-note">Info completa + notas + historial de uso</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-primary">Usar hoy</div><div class="step-note">Mismo CTA que en Today's Pick</div></div>
+</div>
+<div class="branch">
+<div class="branch-item">Desde Grid: <span class="branch-action">[Filtrar]</span> &rarr; Tags de familia olfativa (horizontal scroll)</div>
+<div class="branch-item">Desde Grid: <span class="branch-action">[Buscar]</span> &rarr; Search con resultados en tiempo real</div>
+<div class="branch-item">Desde Grid: <span class="branch-action">[Toggle vista]</span> &rarr; Cambiar entre grid y lista</div>
+<div class="branch-item">Desde Detail: <span class="branch-action">[Editar]</span> &rarr; Edit mode (cambiar tags, notas, foto)</div>
+<div class="branch-item">Desde Detail: <span class="branch-action">[Eliminar]</span> &rarr; Confirmación &rarr; Volver a grid</div>
+</div>
+</div>
+
+<div class="flow">
+<div class="flow-title">Flow 3: añadir fragancia <span class="flow-tag s-primary">Onboarding critical</span></div>
+<div class="flow-desc">Cuantas más fragancias tenga el usuario, mejores las recomendaciones</div>
+<div class="steps">
+<div class="step"><div class="step-box s-dark">Botón [+]</div><div class="step-note">Centro del bottom nav</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Search DB</div><div class="step-note">Buscar por nombre o marca</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Seleccionar resultado</div><div class="step-note">Pre-fill: nombre, marca, notas, foto</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-gold">Personalizar</div><div class="step-note">Tags ocasión, foto propia, notas</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-teal">Guardado</div><div class="step-note">Animación spray + aparece en wardrobe</div></div>
+</div>
+<div class="branch">
+<div class="branch-item">Si no encuentra en DB: <span class="branch-action">[Añadir manual]</span> &rarr; Form completo (nombre, marca, foto, familia, tags)</div>
+<div class="branch-item">Quick add desde Discover: <span class="branch-action">[+ Add]</span> &rarr; Salta al paso Personalizar directamente</div>
+</div>
+</div>
+
+<div class="flow">
+<div class="flow-title">Flow 4: descubrir nuevas <span class="flow-tag" style="background:#E3F3F0;color:#0F6E56">Growth</span></div>
+<div class="flow-desc">Expandir la colección con fragancias que complementen lo que ya tiene</div>
+<div class="steps">
+<div class="step"><div class="step-box s-dark">Tab Discover</div><div class="step-note">Bottom nav</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-violet">AI suggestions</div><div class="step-note">"Basado en tu colección"</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Fragrance detail</div><div class="step-note">Info + por qué te podría gustar</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-rose">Add to wishlist</div><div class="step-note">Guarda para futuro</div></div>
+</div>
+<div class="branch">
+<div class="branch-item">Secciones en Discover: <span class="branch-action">Para ti</span> (AI) / <span class="branch-action">Trending</span> / <span class="branch-action">Por estación</span> / <span class="branch-action">Nuevos lanzamientos</span></div>
+<div class="branch-item">Desde detail: <span class="branch-action">[Comprar]</span> &rarr; Link externo a tienda</div>
+</div>
+</div>
+
+<div class="flow">
+<div class="flow-title">Flow 5: historial de uso <span class="flow-tag s-gold">Retention</span></div>
+<div class="flow-desc">Ver patrones, racha de uso, y fragancias olvidadas</div>
+<div class="steps">
+<div class="step"><div class="step-box s-dark">Profile / Log</div><div class="step-note">Acceso desde profile</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Calendar view</div><div class="step-note">Mes con dots de color por familia</div></div>
+<div class="arrow">&rarr;</div>
+<div class="step"><div class="step-box s-cream">Day detail</div><div class="step-note">Qué usaste + condiciones del día</div></div>
+</div>
+<div class="branch">
+<div class="branch-item">Stats visibles: <span class="branch-action">Más usada</span> / <span class="branch-action">Menos usada</span> / <span class="branch-action">Racha actual</span> / <span class="branch-action">Familias favoritas %</span></div>
+<div class="branch-item">Nudge: <span class="branch-action">"No has usado X en 30 días"</span> &rarr; integra en recomendación AI</div>
+</div>
+</div>
+
+<div class="screen-map">
+<h2>Mapa de pantallas por prioridad</h2>
+<p style="font-size:13px;color:#6B6760;margin:0 0 16px">Construir en este orden en Figma — prioridad 1 primero, luego iterar</p>
+<div class="screens">
+<div class="screen s-primary">
+<div class="priority p1">P1 — Core</div>
+<div class="screen-name">Today's Pick</div>
+<div class="screen-desc">Home de la app. Recomendación diaria + últimas usadas</div>
+</div>
+<div class="screen s-primary">
+<div class="priority p1">P1 — Core</div>
+<div class="screen-name">Wardrobe</div>
+<div class="screen-desc">Grid de colección con search y filtros</div>
+</div>
+<div class="screen s-primary">
+<div class="priority p1">P1 — Core</div>
+<div class="screen-name">Fragrance detail</div>
+<div class="screen-desc">Info completa, notas, historial, acciones</div>
+</div>
+<div class="screen" style="background:#FBF3E0">
+<div class="priority p2">P2 — Add + Log</div>
+<div class="screen-name">Add fragrance</div>
+<div class="screen-desc">Search DB + form manual + personalizar</div>
+</div>
+<div class="screen" style="background:#FBF3E0">
+<div class="priority p2">P2 — Add + Log</div>
+<div class="screen-name">Wear log</div>
+<div class="screen-desc">Calendar + stats + day detail</div>
+</div>
+<div class="screen s-cream">
+<div class="priority p3">P3 — Secondary</div>
+<div class="screen-name">Discover</div>
+<div class="screen-desc">AI suggestions, trending, wishlist</div>
+</div>
+<div class="screen s-cream">
+<div class="priority p3">P3 — Secondary</div>
+<div class="screen-name">Profile</div>
+<div class="screen-desc">Settings, scent DNA, account</div>
+</div>
+<div class="screen s-cream">
+<div class="priority p3">P3 — Secondary</div>
+<div class="screen-name">Onboarding</div>
+<div class="screen-desc">Welcome + add first fragrances + quiz</div>
+</div>
+</div>
+</div>

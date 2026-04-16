@@ -1,0 +1,247 @@
+/* ==========================================================================
+   Spritz — Tailwind CSS v4 Theme
+   Maps directly from spritz-tokens.json
+   CSS-first configuration (no tailwind.config.js needed)
+   ========================================================================== */
+
+@import "tailwindcss";
+
+/* --------------------------------------------------------------------------
+   Custom theme — extends Tailwind v4 defaults
+   -------------------------------------------------------------------------- */
+@theme {
+  /* Typography */
+  --font-display: "Plus Jakarta Sans", sans-serif;
+  --font-body: "DM Sans", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  /* Color: Cream (warm neutral base) */
+  --color-cream-50:  #FBF8F4;
+  --color-cream-100: #F0EBE3;
+  --color-cream-200: #E5E2DB;
+  --color-cream-300: #D6D0C5;
+  --color-cream-500: #A39E94;
+  --color-cream-700: #6B6760;
+  --color-cream-900: #2D2926;
+
+  /* Color: Terracotta (woody/spicy/warm) */
+  --color-terracotta-50:  #FAEAE5;
+  --color-terracotta-100: #F5C9BA;
+  --color-terracotta-200: #EFA68E;
+  --color-terracotta-400: #E85D3A;
+  --color-terracotta-600: #D04A28;
+  --color-terracotta-700: #993C1D;
+  --color-terracotta-900: #4A1B0C;
+
+  /* Color: Teal (fresh/citrus/aquatic) */
+  --color-teal-50:  #E3F3F0;
+  --color-teal-100: #B3DED5;
+  --color-teal-200: #7AC9BB;
+  --color-teal-400: #2A7C6F;
+  --color-teal-600: #1D5C53;
+  --color-teal-700: #0F6E56;
+  --color-teal-900: #04342C;
+
+  /* Color: Rose (floral/powdery) */
+  --color-rose-50:  #FBEDF1;
+  --color-rose-100: #F4C5D3;
+  --color-rose-200: #ED9AB4;
+  --color-rose-400: #C25D7B;
+  --color-rose-600: #9E3D5C;
+  --color-rose-700: #72243E;
+  --color-rose-900: #4B1528;
+
+  /* Color: Violet (oriental/gourmand) */
+  --color-violet-50:  #EEEAFC;
+  --color-violet-100: #CECBF6;
+  --color-violet-200: #AFA9EC;
+  --color-violet-400: #7B61C4;
+  --color-violet-600: #5A419E;
+  --color-violet-700: #3C3489;
+  --color-violet-900: #26215C;
+
+  /* Color: Sage (green/aromatic/herbal) */
+  --color-sage-50:  #E8F3E4;
+  --color-sage-100: #C0DD97;
+  --color-sage-200: #97C459;
+  --color-sage-400: #5D9B4A;
+  --color-sage-600: #3D7832;
+  --color-sage-700: #27500A;
+  --color-sage-900: #173404;
+
+  /* Color: Gold (amber/musk/leather) */
+  --color-gold-50:  #FBF3E0;
+  --color-gold-100: #FAD88B;
+  --color-gold-200: #F2C24E;
+  --color-gold-400: #E8B94A;
+  --color-gold-600: #C49A2E;
+  --color-gold-700: #854F0B;
+  --color-gold-900: #412402;
+
+  /* Spacing scale (extends defaults) */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+
+  /* Border radius — generous, rounded, spray-droplet feel */
+  --radius-sm:   8px;
+  --radius-md:   12px;
+  --radius-lg:   16px;
+  --radius-xl:   20px;
+  --radius-2xl:  24px;
+  --radius-full: 999px;
+
+  /* Shadows — subtle, warm-tinted */
+  --shadow-sm:   0 1px 2px rgba(45, 41, 38, 0.06);
+  --shadow-md:   0 4px 12px rgba(45, 41, 38, 0.08);
+  --shadow-lg:   0 8px 24px rgba(45, 41, 38, 0.10);
+  --shadow-glow: 0 0 20px rgba(232, 93, 58, 0.15);
+
+  /* Breakpoints */
+  --breakpoint-xs: 475px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+
+  /* Animations */
+  --animate-spray-in: spray-in 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-fade-up:  fade-up 0.5s ease-out;
+  --animate-pulse-soft: pulse-soft 3s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Semantic layer — CSS custom properties for component use
+   These bridge tokens → components and enable scent-adaptive theming
+   -------------------------------------------------------------------------- */
+:root {
+  /* Backgrounds */
+  --bg-page:     var(--color-cream-50);
+  --bg-surface:  var(--color-cream-100);
+  --bg-card:     #FFFFFF;
+  --bg-inverse:  var(--color-cream-900);
+
+  /* Text */
+  --text-primary:   var(--color-cream-900);
+  --text-secondary: var(--color-cream-700);
+  --text-muted:     var(--color-cream-500);
+  --text-inverse:   var(--color-cream-50);
+
+  /* Borders */
+  --border-subtle:  var(--color-cream-200);
+  --border-default: var(--color-cream-300);
+  --border-strong:  var(--color-cream-500);
+
+  /* Accent — default to terracotta, overridden by scent theme */
+  --accent:    var(--color-terracotta-400);
+  --accent-bg: var(--color-terracotta-50);
+  --accent-text: var(--color-terracotta-700);
+
+  /* Feedback */
+  --success:    #2A7C6F;
+  --success-bg: #E3F3F0;
+  --warning:    #C49A2E;
+  --warning-bg: #FBF3E0;
+  --error:      #C03A3A;
+  --error-bg:   #FCE8E8;
+}
+
+/* --------------------------------------------------------------------------
+   Scent-adaptive themes — applied via data attribute or class
+   Usage: <div data-scent="fresh"> or <div class="scent-fresh">
+   -------------------------------------------------------------------------- */
+[data-scent="woody"], .scent-woody {
+  --accent:      var(--color-terracotta-400);
+  --accent-bg:   var(--color-terracotta-50);
+  --accent-text: var(--color-terracotta-700);
+}
+
+[data-scent="fresh"], .scent-fresh {
+  --accent:      var(--color-teal-400);
+  --accent-bg:   var(--color-teal-50);
+  --accent-text: var(--color-teal-700);
+}
+
+[data-scent="floral"], .scent-floral {
+  --accent:      var(--color-rose-400);
+  --accent-bg:   var(--color-rose-50);
+  --accent-text: var(--color-rose-700);
+}
+
+[data-scent="oriental"], .scent-oriental {
+  --accent:      var(--color-violet-400);
+  --accent-bg:   var(--color-violet-50);
+  --accent-text: var(--color-violet-700);
+}
+
+[data-scent="green"], .scent-green {
+  --accent:      var(--color-sage-400);
+  --accent-bg:   var(--color-sage-50);
+  --accent-text: var(--color-sage-700);
+}
+
+[data-scent="amber"], .scent-amber {
+  --accent:      var(--color-gold-400);
+  --accent-bg:   var(--color-gold-50);
+  --accent-text: var(--color-gold-700);
+}
+
+/* --------------------------------------------------------------------------
+   Keyframes for Spritz brand animations
+   -------------------------------------------------------------------------- */
+@keyframes spray-in {
+  0%   { opacity: 0; transform: scale(0.8) translateY(8px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes fade-up {
+  0%   { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-soft {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 0.7; }
+}
+
+/* --------------------------------------------------------------------------
+   Base styles
+   -------------------------------------------------------------------------- */
+@layer base {
+  body {
+    font-family: var(--font-body);
+    background: var(--bg-page);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Utility classes for scent tags
+   Usage: <span class="scent-tag scent-tag-woody">Woody</span>
+   -------------------------------------------------------------------------- */
+@layer utilities {
+  .scent-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  .scent-tag-woody    { background: var(--color-terracotta-50); color: var(--color-terracotta-700); }
+  .scent-tag-fresh    { background: var(--color-teal-50);       color: var(--color-teal-700); }
+  .scent-tag-floral   { background: var(--color-rose-50);       color: var(--color-rose-700); }
+  .scent-tag-oriental { background: var(--color-violet-50);     color: var(--color-violet-700); }
+  .scent-tag-green    { background: var(--color-sage-50);       color: var(--color-sage-700); }
+  .scent-tag-amber    { background: var(--color-gold-50);       color: var(--color-gold-700); }
+}

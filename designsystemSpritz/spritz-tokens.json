@@ -1,0 +1,249 @@
+{
+  "$name": "Spritz Design Tokens",
+  "$description": "Single source of truth for Spritz fragrance app — syncs between Figma and Tailwind CSS v4",
+
+  "primitive": {
+    "$description": "Raw values. Never use directly in components.",
+
+    "color": {
+      "cream": {
+        "50":  { "$value": "#FBF8F4", "$type": "color", "$description": "Page background" },
+        "100": { "$value": "#F0EBE3", "$type": "color", "$description": "Surface / card bg" },
+        "200": { "$value": "#E5E2DB", "$type": "color", "$description": "Borders subtle" },
+        "300": { "$value": "#D6D0C5", "$type": "color", "$description": "Borders default" },
+        "500": { "$value": "#A39E94", "$type": "color", "$description": "Muted text" },
+        "700": { "$value": "#6B6760", "$type": "color", "$description": "Secondary text" },
+        "900": { "$value": "#2D2926", "$type": "color", "$description": "Primary text / Ink" }
+      },
+      "terracotta": {
+        "50":  { "$value": "#FAEAE5", "$type": "color" },
+        "100": { "$value": "#F5C9BA", "$type": "color" },
+        "200": { "$value": "#EFA68E", "$type": "color" },
+        "400": { "$value": "#E85D3A", "$type": "color", "$description": "Primary accent" },
+        "600": { "$value": "#D04A28", "$type": "color" },
+        "700": { "$value": "#993C1D", "$type": "color" },
+        "900": { "$value": "#4A1B0C", "$type": "color" }
+      },
+      "teal": {
+        "50":  { "$value": "#E3F3F0", "$type": "color" },
+        "100": { "$value": "#B3DED5", "$type": "color" },
+        "200": { "$value": "#7AC9BB", "$type": "color" },
+        "400": { "$value": "#2A7C6F", "$type": "color", "$description": "Fresh/Citrus/Aquatic" },
+        "600": { "$value": "#1D5C53", "$type": "color" },
+        "700": { "$value": "#0F6E56", "$type": "color" },
+        "900": { "$value": "#04342C", "$type": "color" }
+      },
+      "rose": {
+        "50":  { "$value": "#FBEDF1", "$type": "color" },
+        "100": { "$value": "#F4C5D3", "$type": "color" },
+        "200": { "$value": "#ED9AB4", "$type": "color" },
+        "400": { "$value": "#C25D7B", "$type": "color", "$description": "Floral/Powdery" },
+        "600": { "$value": "#9E3D5C", "$type": "color" },
+        "700": { "$value": "#72243E", "$type": "color" },
+        "900": { "$value": "#4B1528", "$type": "color" }
+      },
+      "violet": {
+        "50":  { "$value": "#EEEAFC", "$type": "color" },
+        "100": { "$value": "#CECBF6", "$type": "color" },
+        "200": { "$value": "#AFA9EC", "$type": "color" },
+        "400": { "$value": "#7B61C4", "$type": "color", "$description": "Oriental/Gourmand" },
+        "600": { "$value": "#5A419E", "$type": "color" },
+        "700": { "$value": "#3C3489", "$type": "color" },
+        "900": { "$value": "#26215C", "$type": "color" }
+      },
+      "sage": {
+        "50":  { "$value": "#E8F3E4", "$type": "color" },
+        "100": { "$value": "#C0DD97", "$type": "color" },
+        "200": { "$value": "#97C459", "$type": "color" },
+        "400": { "$value": "#5D9B4A", "$type": "color", "$description": "Green/Aromatic/Herbal" },
+        "600": { "$value": "#3D7832", "$type": "color" },
+        "700": { "$value": "#27500A", "$type": "color" },
+        "900": { "$value": "#173404", "$type": "color" }
+      },
+      "gold": {
+        "50":  { "$value": "#FBF3E0", "$type": "color" },
+        "100": { "$value": "#FAD88B", "$type": "color" },
+        "200": { "$value": "#F2C24E", "$type": "color" },
+        "400": { "$value": "#E8B94A", "$type": "color", "$description": "Amber/Musk/Leather" },
+        "600": { "$value": "#C49A2E", "$type": "color" },
+        "700": { "$value": "#854F0B", "$type": "color" },
+        "900": { "$value": "#412402", "$type": "color" }
+      },
+      "white":  { "$value": "#FFFFFF", "$type": "color" },
+      "black":  { "$value": "#1A1714", "$type": "color" }
+    },
+
+    "font": {
+      "family": {
+        "display":  { "$value": "'Plus Jakarta Sans', sans-serif", "$type": "fontFamily" },
+        "body":     { "$value": "'DM Sans', sans-serif", "$type": "fontFamily" },
+        "mono":     { "$value": "'JetBrains Mono', monospace", "$type": "fontFamily" }
+      },
+      "weight": {
+        "regular":  { "$value": "400", "$type": "fontWeight" },
+        "medium":   { "$value": "500", "$type": "fontWeight" },
+        "semibold": { "$value": "600", "$type": "fontWeight" },
+        "bold":     { "$value": "700", "$type": "fontWeight" }
+      },
+      "size": {
+        "xs":   { "$value": "12px", "$type": "dimension" },
+        "sm":   { "$value": "14px", "$type": "dimension" },
+        "base":  { "$value": "16px", "$type": "dimension" },
+        "lg":   { "$value": "18px", "$type": "dimension" },
+        "xl":   { "$value": "20px", "$type": "dimension" },
+        "2xl":  { "$value": "24px", "$type": "dimension" },
+        "3xl":  { "$value": "30px", "$type": "dimension" },
+        "4xl":  { "$value": "36px", "$type": "dimension" },
+        "5xl":  { "$value": "48px", "$type": "dimension" }
+      },
+      "lineHeight": {
+        "tight":  { "$value": "1.2", "$type": "number" },
+        "snug":   { "$value": "1.35", "$type": "number" },
+        "normal": { "$value": "1.5", "$type": "number" },
+        "relaxed":{ "$value": "1.65", "$type": "number" }
+      },
+      "letterSpacing": {
+        "tight":    { "$value": "-0.02em", "$type": "dimension" },
+        "normal":   { "$value": "0", "$type": "dimension" },
+        "wide":     { "$value": "0.04em", "$type": "dimension" },
+        "widest":   { "$value": "0.08em", "$type": "dimension" }
+      }
+    },
+
+    "spacing": {
+      "0":   { "$value": "0px", "$type": "dimension" },
+      "1":   { "$value": "4px", "$type": "dimension" },
+      "2":   { "$value": "8px", "$type": "dimension" },
+      "3":   { "$value": "12px", "$type": "dimension" },
+      "4":   { "$value": "16px", "$type": "dimension" },
+      "5":   { "$value": "20px", "$type": "dimension" },
+      "6":   { "$value": "24px", "$type": "dimension" },
+      "8":   { "$value": "32px", "$type": "dimension" },
+      "10":  { "$value": "40px", "$type": "dimension" },
+      "12":  { "$value": "48px", "$type": "dimension" },
+      "16":  { "$value": "64px", "$type": "dimension" },
+      "20":  { "$value": "80px", "$type": "dimension" },
+      "24":  { "$value": "96px", "$type": "dimension" }
+    },
+
+    "radius": {
+      "sm":   { "$value": "8px", "$type": "dimension" },
+      "md":   { "$value": "12px", "$type": "dimension" },
+      "lg":   { "$value": "16px", "$type": "dimension" },
+      "xl":   { "$value": "20px", "$type": "dimension" },
+      "2xl":  { "$value": "24px", "$type": "dimension" },
+      "full": { "$value": "999px", "$type": "dimension" }
+    },
+
+    "shadow": {
+      "sm":   { "$value": "0 1px 2px rgba(45,41,38,0.06)", "$type": "boxShadow" },
+      "md":   { "$value": "0 4px 12px rgba(45,41,38,0.08)", "$type": "boxShadow" },
+      "lg":   { "$value": "0 8px 24px rgba(45,41,38,0.10)", "$type": "boxShadow" },
+      "glow": { "$value": "0 0 20px rgba(232,93,58,0.15)", "$type": "boxShadow", "$description": "Warm glow for active/hover" }
+    }
+  },
+
+  "semantic": {
+    "$description": "Purpose-driven tokens. Use these in components.",
+
+    "color": {
+      "bg": {
+        "page":     { "$value": "{primitive.color.cream.50}", "$type": "color" },
+        "surface":  { "$value": "{primitive.color.cream.100}", "$type": "color" },
+        "card":     { "$value": "{primitive.color.white}", "$type": "color" },
+        "elevated": { "$value": "{primitive.color.white}", "$type": "color" },
+        "inverse":  { "$value": "{primitive.color.cream.900}", "$type": "color" }
+      },
+      "text": {
+        "primary":   { "$value": "{primitive.color.cream.900}", "$type": "color" },
+        "secondary": { "$value": "{primitive.color.cream.700}", "$type": "color" },
+        "muted":     { "$value": "{primitive.color.cream.500}", "$type": "color" },
+        "inverse":   { "$value": "{primitive.color.cream.50}", "$type": "color" },
+        "link":      { "$value": "{primitive.color.terracotta.400}", "$type": "color" }
+      },
+      "border": {
+        "subtle":  { "$value": "{primitive.color.cream.200}", "$type": "color" },
+        "default": { "$value": "{primitive.color.cream.300}", "$type": "color" },
+        "strong":  { "$value": "{primitive.color.cream.500}", "$type": "color" }
+      },
+      "accent": {
+        "primary":   { "$value": "{primitive.color.terracotta.400}", "$type": "color" },
+        "secondary": { "$value": "{primitive.color.teal.400}", "$type": "color" }
+      },
+      "scent": {
+        "woody":    { "$value": "{primitive.color.terracotta.400}", "$type": "color" },
+        "fresh":    { "$value": "{primitive.color.teal.400}", "$type": "color" },
+        "floral":   { "$value": "{primitive.color.rose.400}", "$type": "color" },
+        "oriental": { "$value": "{primitive.color.violet.400}", "$type": "color" },
+        "green":    { "$value": "{primitive.color.sage.400}", "$type": "color" },
+        "amber":    { "$value": "{primitive.color.gold.400}", "$type": "color" }
+      },
+      "scent-bg": {
+        "woody":    { "$value": "{primitive.color.terracotta.50}", "$type": "color" },
+        "fresh":    { "$value": "{primitive.color.teal.50}", "$type": "color" },
+        "floral":   { "$value": "{primitive.color.rose.50}", "$type": "color" },
+        "oriental": { "$value": "{primitive.color.violet.50}", "$type": "color" },
+        "green":    { "$value": "{primitive.color.sage.50}", "$type": "color" },
+        "amber":    { "$value": "{primitive.color.gold.50}", "$type": "color" }
+      },
+      "feedback": {
+        "success":     { "$value": "#2A7C6F", "$type": "color" },
+        "success-bg":  { "$value": "#E3F3F0", "$type": "color" },
+        "warning":     { "$value": "#C49A2E", "$type": "color" },
+        "warning-bg":  { "$value": "#FBF3E0", "$type": "color" },
+        "error":       { "$value": "#C03A3A", "$type": "color" },
+        "error-bg":    { "$value": "#FCE8E8", "$type": "color" },
+        "info":        { "$value": "#5A419E", "$type": "color" },
+        "info-bg":     { "$value": "#EEEAFC", "$type": "color" }
+      }
+    }
+  },
+
+  "component": {
+    "$description": "Component-specific tokens.",
+
+    "button": {
+      "primary": {
+        "bg":      { "$value": "{primitive.color.cream.900}", "$type": "color" },
+        "text":    { "$value": "{primitive.color.cream.50}", "$type": "color" },
+        "radius":  { "$value": "{primitive.radius.md}", "$type": "dimension" },
+        "padding": { "$value": "12px 24px", "$type": "dimension" }
+      },
+      "secondary": {
+        "bg":      { "$value": "{primitive.color.cream.100}", "$type": "color" },
+        "text":    { "$value": "{primitive.color.cream.700}", "$type": "color" },
+        "radius":  { "$value": "{primitive.radius.md}", "$type": "dimension" }
+      },
+      "accent": {
+        "bg":      { "$value": "{primitive.color.terracotta.400}", "$type": "color" },
+        "text":    { "$value": "{primitive.color.white}", "$type": "color" },
+        "radius":  { "$value": "{primitive.radius.md}", "$type": "dimension" }
+      }
+    },
+    "card": {
+      "bg":      { "$value": "{primitive.color.white}", "$type": "color" },
+      "border":  { "$value": "{primitive.color.cream.200}", "$type": "color" },
+      "radius":  { "$value": "{primitive.radius.lg}", "$type": "dimension" },
+      "padding": { "$value": "{primitive.spacing.4}", "$type": "dimension" },
+      "shadow":  { "$value": "{primitive.shadow.sm}", "$type": "boxShadow" }
+    },
+    "input": {
+      "bg":       { "$value": "{primitive.color.cream.50}", "$type": "color" },
+      "border":   { "$value": "{primitive.color.cream.300}", "$type": "color" },
+      "radius":   { "$value": "{primitive.radius.md}", "$type": "dimension" },
+      "text":     { "$value": "{primitive.color.cream.900}", "$type": "color" },
+      "placeholder": { "$value": "{primitive.color.cream.500}", "$type": "color" }
+    },
+    "tag": {
+      "radius": { "$value": "{primitive.radius.full}", "$type": "dimension" },
+      "padding": { "$value": "4px 10px", "$type": "dimension" },
+      "fontSize": { "$value": "{primitive.font.size.xs}", "$type": "dimension" }
+    },
+    "bottle": {
+      "radius":  { "$value": "{primitive.radius.md}", "$type": "dimension" },
+      "size-sm": { "$value": "40px", "$type": "dimension" },
+      "size-md": { "$value": "56px", "$type": "dimension" },
+      "size-lg": { "$value": "80px", "$type": "dimension" }
+    }
+  }
+}

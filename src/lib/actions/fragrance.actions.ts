@@ -1,0 +1,142 @@
+"use server"
+
+import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { revalidatePath } from "next/cache"
+import type { FragranceCatalogResult } from "@/lib/api/parfumo"
+
+interface AddToWardrobeParams {
+  catalogResult?: FragranceCatalogResult
+  customName?: string
+  customBrand?: string
+  customFamily?: string
+  customImageUrl?: string   // URL pasted in ManualEntryForm
+  customTopNotes?: string[]
+  customMiddleNotes?: string[]
+  customBaseNotes?: string[]
+  personalNotes?: string
+  photoUrl?: string         // User-uploaded photo via Supabase Storage
+  occasionTags?: string[]
+  seasonTags?: string[]
+  moodTags?: string[]
+}
+
+export async function addToWardrobe(params: AddToWardrobeParams) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error("No autenticado")
+
+  let fragranceId: string | null = null
+
+  // If we have a catalog result, upsert into the public fragrances table first
+  if (params.catalogResult) {
+    const cat = params.catalogResult
+    const { data: existing } = await supabase
+      .from("fragrances")
+      .select("id")
+      .eq("external_id", cat.id)
+      .maybeSingle()
+
+    if (existing) {
+      fragranceId = existing.id
+    } else {
+      const { data: inserted, error } = await supabase
+        .from("fragrances")
+        .insert({
+          name: cat.name,
+          brand: cat.brand,
+          family: cat.family,
+          top_notes: cat.topNotes,
+          middle_notes: cat.middleNotes,
+          base_notes: cat.baseNotes,
+          description: cat.description,
+          image_url: cat.imageUrl,
+          external_id: cat.id,
+          gender: cat.gender,
+          year_released: cat.year,
+        })
+        .select("id")
+        .single()
+
+      if (error) throw new Error(error.message)
+      fragranceId = inserted.id
+    }
+  }
+
+  // Build custom_notes for manual entries
+  const hasCustomNotes =
+    (params.customTopNotes?.length ?? 0) > 0 ||
+    (params.customMiddleNotes?.length ?? 0) > 0 ||
+    (params.customBaseNotes?.length ?? 0) > 0
+  const customNotes = hasCustomNotes
+    ? {
+        top: params.customTopNotes ?? [],
+        middle: params.customMiddleNotes ?? [],
+        base: params.customBaseNotes ?? [],
+      }
+    : null
+
+  // photo_url: prefer uploaded photo, fall back to URL pasted in manual entry
+  const photoUrl = params.photoUrl ?? params.customImageUrl ?? null
+
+  // Insert user_fragrance
+  const { error } = await supabase.from("user_fragrances").insert({
+    user_id: session.user.id,
+    fragrance_id: fragranceId,
+    custom_name: params.customName ?? null,
+    custom_brand: params.customBrand ?? null,
+    custom_family: params.customFamily ?? null,
+    custom_notes: customNotes,
+    photo_url: photoUrl,
+    personal_notes: params.personalNotes ?? null,
+    occasion_tags: params.occasionTags ?? [],
+    season_tags: params.seasonTags ?? [],
+    mood_tags: params.moodTags ?? [],
+    status: "active",
+  })
+
+  if (error) {
+    // 23505 = unique_violation. Only relevant for catalog fragrances (fragrance_id NOT NULL).
+    // Manual entries (fragrance_id NULL) should never trigger this unless DB constraint
+    // was set up with NULLS NOT DISTINCT — fix that with the SQL below.
+    if (error.code === "23505" && fragranceId) {
+      throw new Error("Ya tienes esta fragancia en tu colección")
+    }
+    throw new Error(error.message)
+  }
+
+  revalidatePath("/wardrobe")
+}
+
+export async function updateFragrance(
+  id: string,
+  updates: {
+    personalNotes?: string
+    occasionTags?: string[]
+    seasonTags?: string[]
+    moodTags?: string[]
+    status?: string
+    mlRemaining?: number | null
+    photoUrl?: string | null
+  }
+) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error("No autenticado")
+
+  const { error } = await supabase
+    .from("user_fragrances")
+    .update({
+      personal_notes: updates.personalNotes,
+      occasion_tags: updates.occasionTags,
+      season_tags: updates.seasonTags,
+      mood_tags: updates.moodTags,
+      status: updates.status,
+      ml_remaining: updates.mlRemaining,
+      photo_url: updates.photoUrl,
+    })
+    .eq("id", id)
+    .eq("user_id", session.user.id)
+
+  if (error) throw new Error(error.message)
+  revalidatePath("/wardrobe")
+}

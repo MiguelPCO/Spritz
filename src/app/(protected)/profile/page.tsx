@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useState, useTransition, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Pencil, Check, X, LogOut } from "lucide-react"
+import { Pencil, Check, X, LogOut, BookOpen, ChevronRight } from "lucide-react"
+import Link from "next/link"
 import { TopBar } from "@/components/layout/TopBar"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useProfile } from "@/lib/hooks/useProfile"
@@ -13,6 +14,8 @@ import { useRecentWears } from "@/lib/hooks/useWearLog"
 import { updateProfile } from "@/lib/actions/profile.actions"
 import { createClient } from "@/lib/supabase/client"
 import { queryKeys } from "@/lib/constants/queryKeys"
+import { getFragranceFamily } from "@/types/fragrance"
+import { getScentFamily } from "@/lib/constants/scentFamilies"
 
 function getInitials(displayName: string | null | undefined, email: string | undefined): string {
   if (displayName?.trim()) {
@@ -31,6 +34,17 @@ export default function ProfilePage() {
 
   const [editing, setEditing] = useState(false)
   const [nameInput, setNameInput] = useState("")
+
+  const activeFragrances = wardrobe.filter((uf) => uf.status === "active")
+  const dominantFamilyId = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const uf of activeFragrances) {
+      const f = getFragranceFamily(uf)
+      counts[f] = (counts[f] ?? 0) + 1
+    }
+    return Object.entries(counts).sort((a, b) => b[1] - a[1])[0]?.[0] ?? null
+  }, [activeFragrances])
+  const dominantDef = dominantFamilyId ? getScentFamily(dominantFamilyId) : null
 
   function startEdit() {
     setNameInput(profile?.display_name ?? "")
@@ -88,7 +102,6 @@ export default function ProfilePage() {
             </>
           ) : (
             <>
-              {/* Avatar circle */}
               <div
                 className="flex h-20 w-20 items-center justify-center rounded-full text-2xl font-bold text-white"
                 style={{ backgroundColor: "var(--scent-accent)" }}
@@ -96,7 +109,6 @@ export default function ProfilePage() {
                 {initials}
               </div>
 
-              {/* Editable display name */}
               {editing ? (
                 <div className="flex items-center gap-2 w-full max-w-[220px]">
                   <input
@@ -131,13 +143,31 @@ export default function ProfilePage() {
                 </button>
               )}
 
-              {/* Email */}
               <p className="text-sm" style={{ color: "var(--text-muted)" }}>
                 {profile?.email}
               </p>
             </>
           )}
         </div>
+
+        {/* DNA profile card */}
+        {dominantDef && activeFragrances.length >= 3 && (
+          <div
+            data-scent={dominantDef.id}
+            className="rounded-[16px] p-4 flex items-center gap-3"
+            style={{ backgroundColor: "var(--scent-accent-light)" }}
+          >
+            <span className="text-3xl">{dominantDef.emoji}</span>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--scent-accent)" }}>
+                Perfil olfativo
+              </p>
+              <p className="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                Colección {dominantDef.labelEs}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Stats */}
         <div className="grid grid-cols-2 gap-3">
@@ -170,6 +200,19 @@ export default function ProfilePage() {
             </p>
           </div>
         </div>
+
+        {/* Registro de uso link */}
+        <Link
+          href="/log"
+          className="flex w-full items-center justify-between rounded-[16px] px-4 py-3.5 text-sm font-medium"
+          style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-primary)" }}
+        >
+          <span className="flex items-center gap-2">
+            <BookOpen size={16} />
+            Registro de uso
+          </span>
+          <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
+        </Link>
 
         {/* Logout */}
         <button

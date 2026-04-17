@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next"
-import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono } from "next/font/google"
+import { Plus_Jakarta_Sans, DM_Sans, JetBrains_Mono, Fraunces } from "next/font/google"
 import { Toaster } from "@/components/ui/sonner"
 import { QueryProvider } from "@/providers/QueryProvider"
 import "./globals.css"
@@ -22,6 +22,13 @@ const jetbrainsMono = JetBrains_Mono({
   subsets: ["latin"],
   weight: ["400"],
   variable: "--font-mono",
+  display: "swap",
+})
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["300", "400", "600"],
+  variable: "--font-fraunces",
   display: "swap",
 })
 
@@ -62,7 +69,7 @@ export default function RootLayout({
   return (
     <html
       lang="es"
-      className={`${jakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable}`}
+      className={`${jakarta.variable} ${dmSans.variable} ${jetbrainsMono.variable} ${fraunces.variable}`}
     >
       <body>
         <QueryProvider>

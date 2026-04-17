@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Shirt, Plus, BookOpen, User } from "lucide-react"
+import { Home, Shirt, Plus, Compass, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
   { href: "/today",    label: "Hoy",       icon: Home  },
   { href: "/wardrobe", label: "Colección", icon: Shirt },
   { href: "/add",      label: "",          icon: Plus  }, // FAB center
-  { href: "/log",      label: "Registro",  icon: BookOpen },
+  { href: "/discover", label: "Descubrir",  icon: Compass },
   { href: "/profile",  label: "Perfil",    icon: User  },
 ] as const
 

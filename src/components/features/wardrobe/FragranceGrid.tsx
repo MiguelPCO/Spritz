@@ -11,12 +11,12 @@ import { Plus } from "lucide-react"
 interface FragranceGridProps {
   fragrances: UserFragrance[]
   isLoading: boolean
+  lastWornDates?: Record<string, string>
 }
 
-export function FragranceGrid({ fragrances, isLoading }: FragranceGridProps) {
-  const { viewMode, activeFilter, searchQuery } = useWardrobeStore()
+export function FragranceGrid({ fragrances, isLoading, lastWornDates }: FragranceGridProps) {
+  const { viewMode, activeFilter, searchQuery, sortBy } = useWardrobeStore()
 
-  // Apply filters
   const filtered = fragrances.filter((uf) => {
     if (activeFilter && getFragranceFamily(uf) !== activeFilter) return false
     if (searchQuery) {
@@ -29,6 +29,12 @@ export function FragranceGrid({ fragrances, isLoading }: FragranceGridProps) {
     return true
   })
 
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === "name") return getFragranceName(a).localeCompare(getFragranceName(b), "es")
+    if (sortBy === "brand") return getFragranceBrand(a).localeCompare(getFragranceBrand(b), "es")
+    return 0 // "date_added" — Supabase returns newest first already
+  })
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-2 gap-3 px-5">
@@ -39,7 +45,7 @@ export function FragranceGrid({ fragrances, isLoading }: FragranceGridProps) {
     )
   }
 
-  if (filtered.length === 0) {
+  if (sorted.length === 0) {
     return (
       <div className="flex flex-col items-center py-12 text-center">
         <p className="text-2xl mb-2">🫙</p>
@@ -70,8 +76,18 @@ export function FragranceGrid({ fragrances, isLoading }: FragranceGridProps) {
   if (viewMode === "list") {
     return (
       <div className="space-y-2 px-5">
-        {filtered.map((uf) => (
-          <FragranceCard key={uf.id} userFragrance={uf} variant="full" />
+        {sorted.map((uf, index) => (
+          <div
+            key={uf.id}
+            className="animate-fade-up"
+            style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
+          >
+            <FragranceCard
+              userFragrance={uf}
+              variant="full"
+              lastWornAt={lastWornDates?.[uf.id]}
+            />
+          </div>
         ))}
       </div>
     )
@@ -79,8 +95,18 @@ export function FragranceGrid({ fragrances, isLoading }: FragranceGridProps) {
 
   return (
     <div className="grid grid-cols-2 gap-3 px-5">
-      {filtered.map((uf) => (
-        <FragranceCard key={uf.id} userFragrance={uf} variant="compact" />
+      {sorted.map((uf, index) => (
+        <div
+          key={uf.id}
+          className="animate-fade-up"
+          style={{ animationDelay: `${Math.min(index * 50, 300)}ms` }}
+        >
+          <FragranceCard
+            userFragrance={uf}
+            variant="compact"
+            lastWornAt={lastWornDates?.[uf.id]}
+          />
+        </div>
       ))}
     </div>
   )

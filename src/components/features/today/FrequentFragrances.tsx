@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { Droplets } from "lucide-react"
 import Image from "next/image"
 import { toast } from "sonner"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
@@ -10,7 +9,7 @@ import { logWear } from "@/lib/actions/wear.actions"
 import type { UserFragrance } from "@/types/fragrance"
 
 interface FrequentFragrancesProps {
-  fragrances: UserFragrance[]
+  fragrances: Array<{ uf: UserFragrance; count: number }>
 }
 
 export function FrequentFragrances({ fragrances }: FrequentFragrancesProps) {
@@ -40,10 +39,10 @@ export function FrequentFragrances({ fragrances }: FrequentFragrancesProps) {
   return (
     <div className="space-y-2 px-5">
       <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-        Esta semana
+        Tus favoritas esta semana
       </p>
       <div className="flex gap-3 overflow-x-auto pb-1 -mx-5 px-5">
-        {fragrances.map((uf) => {
+        {fragrances.map(({ uf, count }) => {
           const family = getFragranceFamily(uf)
           const familyDef = getScentFamily(family)
           const imageUrl = getFragranceImageUrl(uf)
@@ -52,10 +51,18 @@ export function FrequentFragrances({ fragrances }: FrequentFragrancesProps) {
           return (
             <div
               key={uf.id}
-              className="flex shrink-0 flex-col items-center gap-2 rounded-[16px] p-3 w-[100px]"
+              className="relative flex shrink-0 flex-col items-center gap-2 rounded-[16px] p-3 w-[100px]"
               style={{ backgroundColor: "var(--bg-surface)" }}
             >
-              {/* Circle image or family color */}
+              {/* Count badge */}
+              <span
+                className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold text-white z-10"
+                style={{ backgroundColor: "var(--scent-accent)" }}
+              >
+                {count}
+              </span>
+
+              {/* Circle image or family emoji */}
               <div
                 className="flex h-14 w-14 items-center justify-center rounded-full overflow-hidden"
                 style={{ backgroundColor: familyDef.colorLight }}
@@ -69,7 +76,7 @@ export function FrequentFragrances({ fragrances }: FrequentFragrancesProps) {
                     className="h-full w-full object-cover"
                   />
                 ) : (
-                  <Droplets size={20} style={{ color: familyDef.color }} />
+                  <span className="text-2xl select-none">{familyDef.emoji}</span>
                 )}
               </div>
 

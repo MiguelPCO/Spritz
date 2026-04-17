@@ -36,9 +36,11 @@ export function TopBar({
               style={{ backgroundColor: "var(--scent-accent)" }}
             />
             <span
-              className="text-lg font-semibold tracking-tight"
               style={{
-                fontFamily: "var(--font-jakarta)",
+                fontFamily: "var(--font-fraunces)",
+                fontWeight: 300,
+                fontSize: "1.25rem",
+                letterSpacing: "-0.01em",
                 color: "var(--text-primary)",
               }}
             >

@@ -3,7 +3,6 @@ import { SprayParticles } from "@/components/layout/SprayParticles"
 import type { UserFragrance } from "@/types/fragrance"
 import { getFragranceName, getFragranceBrand, getFragranceFamily, getFragranceImageUrl } from "@/types/fragrance"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
-import { Droplets } from "lucide-react"
 
 interface RecommendationCardProps {
   userFragrance: UserFragrance
@@ -26,8 +25,12 @@ export function RecommendationCard({
   return (
     <div
       data-scent={scentAttr}
-      className="relative mx-5 overflow-hidden rounded-[20px] p-5"
-      style={{ backgroundColor: "var(--scent-accent-light)" }}
+      className="animate-spray-in relative mx-5 overflow-hidden rounded-[20px] p-5"
+      style={{
+        backgroundColor: "var(--scent-accent-light)",
+        boxShadow: "var(--shadow-glow), 0 4px 12px rgba(45,41,38,0.08)",
+        border: "1px solid color-mix(in srgb, var(--scent-accent) 20%, transparent)",
+      }}
     >
       {/* Background spray particles */}
       <SprayParticles intensity={0.6} />
@@ -51,30 +54,31 @@ export function RecommendationCard({
         <div className="mb-4 flex items-center gap-4">
           {/* Bottle avatar */}
           <div
-            className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[16px]"
+            className="flex h-24 w-24 shrink-0 items-center justify-center rounded-[18px]"
             style={{
               backgroundColor: imageUrl ? "transparent" : "var(--scent-accent)",
+              boxShadow: "0 8px 20px rgba(45,41,38,0.12)",
             }}
           >
             {imageUrl ? (
               <Image
                 src={imageUrl}
                 alt={name}
-                width={80}
-                height={80}
-                className="h-full w-full rounded-[16px] object-cover"
+                width={96}
+                height={96}
+                className="h-full w-full rounded-[18px] object-cover"
               />
             ) : (
-              <Droplets size={32} className="text-white" />
+              <span className="text-4xl select-none">{familyDef.emoji}</span>
             )}
           </div>
 
           {/* Name + brand + family */}
           <div className="flex-1 min-w-0">
             <p
-              className="text-xl font-semibold leading-tight tracking-tight"
+              className="text-2xl font-light leading-tight tracking-tight"
               style={{
-                fontFamily: "var(--font-jakarta)",
+                fontFamily: "var(--font-fraunces)",
                 color: "var(--text-primary)",
               }}
             >

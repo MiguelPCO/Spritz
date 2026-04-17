@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo } from "react"
+import { isToday } from "date-fns"
 import { toast } from "sonner"
 import { Sparkles, ArrowLeft } from "lucide-react"
 import { TopBar } from "@/components/layout/TopBar"
@@ -18,7 +19,8 @@ import { useRecommendation } from "@/lib/hooks/useRecommendation"
 import { useRecommendationStore } from "@/lib/stores/recommendationStore"
 import { logWear } from "@/lib/actions/wear.actions"
 import { getTimeOfDay } from "@/types/weather"
-import { getFragranceName } from "@/types/fragrance"
+import { getFragranceName, getFragranceFamily } from "@/types/fragrance"
+import { getScentFamily } from "@/lib/constants/scentFamilies"
 import type { UserFragrance } from "@/types/fragrance"
 import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
@@ -33,19 +35,26 @@ export default function TodayPage() {
   const { data: wardrobe = [], isLoading: wardrobeLoading } = useWardrobe()
   const { data: recentWearLogs = [] } = useRecentWears()
 
-  // Derive top fragrances from recent wear history (last 7 days)
-  const topFragrances = useMemo<UserFragrance[]>(() => {
+  // Derive top fragrances with wear count
+  const topFragrancesWithCount = useMemo<Array<{ uf: UserFragrance; count: number }>>(() => {
     const freq = new Map<string, { uf: UserFragrance; count: number }>()
     for (const log of recentWearLogs) {
       if (!log.user_fragrance) continue
-      const prev = freq.get(log.user_fragrance_id) ?? { uf: log.user_fragrance as unknown as UserFragrance, count: 0 }
+      const prev = freq.get(log.user_fragrance_id) ?? {
+        uf: log.user_fragrance as unknown as UserFragrance,
+        count: 0,
+      }
       freq.set(log.user_fragrance_id, { ...prev, count: prev.count + 1 })
     }
-    return [...freq.values()]
-      .sort((a, b) => b.count - a.count)
-      .slice(0, 4)
-      .map((v) => v.uf)
+    return [...freq.values()].sort((a, b) => b.count - a.count).slice(0, 4)
   }, [recentWearLogs])
+
+  // Detect if already worn today
+  const wornTodayFragrance = useMemo(() => {
+    const todayLog = recentWearLogs.find((log) => isToday(new Date(log.worn_at)))
+    if (!todayLog) return null
+    return wardrobe.find((uf) => uf.id === todayLog.user_fragrance_id) ?? null
+  }, [recentWearLogs, wardrobe])
 
   const aiContext = useMemo(() => {
     if (wardrobe.length === 0 || !weather) return null
@@ -152,14 +161,39 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Frequent fragrances — visible in both phases */}
-        {wardrobe.length > 0 && topFragrances.length > 0 && (
-          <FrequentFragrances fragrances={topFragrances} />
+        {/* Frequent fragrances */}
+        {wardrobe.length > 0 && topFragrancesWithCount.length > 0 && (
+          <FrequentFragrances fragrances={topFragrancesWithCount} />
         )}
 
         {/* — PHASE 1: Context selection — */}
         {wardrobe.length > 0 && !hasRequested && (
           <>
+            {/* Already worn today banner */}
+            {wornTodayFragrance && (
+              <div
+                className="mx-5 rounded-[16px] p-4 flex items-center gap-3"
+                style={{ backgroundColor: "var(--bg-surface)" }}
+              >
+                <span className="text-2xl select-none">
+                  {getScentFamily(getFragranceFamily(wornTodayFragrance)).emoji}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold truncate" style={{ color: "var(--text-primary)" }}>
+                    {getFragranceName(wornTodayFragrance)}
+                  </p>
+                  <p className="text-xs" style={{ color: "var(--text-muted)" }}>Ya registrada hoy</p>
+                </div>
+                <button
+                  onClick={handleDiscover}
+                  className="text-xs font-medium px-3 py-1.5 rounded-full shrink-0"
+                  style={{ backgroundColor: "var(--scent-accent-light)", color: "var(--scent-accent)" }}
+                >
+                  ¿Otra?
+                </button>
+              </div>
+            )}
+
             {/* Context card */}
             <div
               className="mx-5 rounded-[20px] p-5 space-y-5"
@@ -167,8 +201,8 @@ export default function TodayPage() {
             >
               <div>
                 <h2
-                  className="text-lg font-semibold"
-                  style={{ fontFamily: "var(--font-jakarta)", color: "var(--text-primary)" }}
+                  className="text-lg font-light"
+                  style={{ fontFamily: "var(--font-fraunces)", color: "var(--text-primary)" }}
                 >
                   ¿Cómo es tu día hoy?
                 </h2>
@@ -195,7 +229,6 @@ export default function TodayPage() {
                   Estado de ánimo <span className="normal-case font-normal" style={{ color: "var(--text-muted)" }}>(elige varios)</span>
                 </p>
                 <MoodSelector value={moods} onChange={(newMoods) => {
-                  // Sync store: toggle each changed mood
                   const toAdd = newMoods.filter((m) => !moods.includes(m))
                   const toRemove = moods.filter((m) => !newMoods.includes(m))
                   toAdd.forEach(toggleMood)
@@ -230,7 +263,6 @@ export default function TodayPage() {
         {/* — PHASE 2: Recommendation — */}
         {hasRequested && (
           <>
-            {/* Loading skeleton */}
             {recLoading && !recommendation && (
               <div className="space-y-3 mx-5">
                 <Skeleton className="h-[200px] w-full rounded-[20px]" />
@@ -238,7 +270,6 @@ export default function TodayPage() {
               </div>
             )}
 
-            {/* Recommendation card */}
             {recommendedFragrance && recommendation && (
               <RecommendationCard
                 userFragrance={recommendedFragrance}
@@ -247,7 +278,6 @@ export default function TodayPage() {
               />
             )}
 
-            {/* Action buttons */}
             {recommendedFragrance && (
               <ActionButtons
                 onWear={handleWear}
@@ -257,7 +287,6 @@ export default function TodayPage() {
               />
             )}
 
-            {/* Change context link */}
             {!recLoading && (
               <div className="flex justify-center">
                 <button

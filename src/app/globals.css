@@ -12,6 +12,7 @@
   --font-dm: "DM Sans", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
   --font-sans: var(--font-dm);
+  --font-fraunces: "Fraunces", serif;
 
   /* ── Cream (warm neutral base) ── */
   --color-cream-50:  #FBF8F4;
@@ -224,6 +225,17 @@
   0%   { transform: translateY(0px) scale(1);     opacity: 0.4; }
   50%  { transform: translateY(-12px) scale(1.1); opacity: 0.6; }
   100% { transform: translateY(0px) scale(1);     opacity: 0.4; }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   ANIMATION UTILITIES
+───────────────────────────────────────────────────────────────────────────── */
+.animate-spray-in {
+  animation: spray-in 0.4s ease-out both;
+}
+
+.animate-fade-up {
+  animation: fade-up 0.35s ease-out both;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────

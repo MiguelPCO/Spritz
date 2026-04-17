@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { Droplets } from "lucide-react"
 import type { UserFragrance } from "@/types/fragrance"
 import {
   getFragranceName,
@@ -8,12 +7,15 @@ import {
   getFragranceImageUrl,
 } from "@/types/fragrance"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
+import { formatDistanceToNow } from "date-fns"
+import { es } from "date-fns/locale"
 
 interface FragranceHeaderProps {
   userFragrance: UserFragrance
+  lastWornAt?: string | null
 }
 
-export function FragranceHeader({ userFragrance: uf }: FragranceHeaderProps) {
+export function FragranceHeader({ userFragrance: uf, lastWornAt }: FragranceHeaderProps) {
   const name = getFragranceName(uf)
   const brand = getFragranceBrand(uf)
   const family = getFragranceFamily(uf)
@@ -30,7 +32,7 @@ export function FragranceHeader({ userFragrance: uf }: FragranceHeaderProps) {
       {/* Bottle image */}
       <div
         className="flex h-32 w-32 items-center justify-center rounded-[20px] shadow-md"
-        style={{ backgroundColor: imageUrl ? "transparent" : "var(--scent-accent)" }}
+        style={{ backgroundColor: imageUrl ? "transparent" : "var(--scent-accent-light)" }}
       >
         {imageUrl ? (
           <Image
@@ -41,14 +43,14 @@ export function FragranceHeader({ userFragrance: uf }: FragranceHeaderProps) {
             className="h-full w-full rounded-[20px] object-cover"
           />
         ) : (
-          <Droplets size={48} className="text-white" />
+          <span className="text-5xl select-none">{familyDef.emoji}</span>
         )}
       </div>
 
       {/* Info */}
       <h1
-        className="mt-4 text-2xl font-semibold tracking-tight text-center"
-        style={{ fontFamily: "var(--font-jakarta)", color: "var(--text-primary)" }}
+        className="mt-4 text-2xl font-light tracking-tight text-center"
+        style={{ fontFamily: "var(--font-fraunces)", color: "var(--text-primary)" }}
       >
         {name}
       </h1>
@@ -58,6 +60,11 @@ export function FragranceHeader({ userFragrance: uf }: FragranceHeaderProps) {
       <span className={`scent-tag scent-tag-${scentAttr} mt-3`}>
         {familyDef.emoji} {familyDef.labelEs}
       </span>
+      {lastWornAt && (
+        <p className="mt-1 text-xs" style={{ color: "var(--text-muted)" }}>
+          Última vez {formatDistanceToNow(new Date(lastWornAt), { addSuffix: true, locale: es })}
+        </p>
+      )}
     </div>
   )
 }

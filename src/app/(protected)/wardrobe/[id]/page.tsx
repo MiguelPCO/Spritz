@@ -1,14 +1,17 @@
 "use client"
 
-import { use } from "react"
+import { use, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronLeft } from "lucide-react"
 import { FragranceHeader } from "@/components/features/detail/FragranceHeader"
 import { NotesDisplay } from "@/components/features/detail/NotesDisplay"
 import { PersonalTags } from "@/components/features/detail/PersonalTags"
 import { DetailActions } from "@/components/features/detail/DetailActions"
+import { FragranceCard } from "@/components/features/wardrobe/FragranceCard"
 import { useFragrance } from "@/lib/hooks/useFragrance"
-import { getFragranceName } from "@/types/fragrance"
+import { useWardrobe } from "@/lib/hooks/useWardrobe"
+import { useLastWornByFragrance } from "@/lib/hooks/useWearLog"
+import { getFragranceName, getFragranceFamily } from "@/types/fragrance"
 import { Skeleton } from "@/components/ui/skeleton"
 
 interface Props {
@@ -19,6 +22,16 @@ export default function FragranceDetailPage({ params }: Props) {
   const { id } = use(params)
   const router = useRouter()
   const { data: uf, isLoading } = useFragrance(id)
+  const { data: allFragrances = [] } = useWardrobe()
+  const { data: lastWornAt } = useLastWornByFragrance(id)
+
+  const similar = useMemo(() => {
+    if (!uf) return []
+    const family = getFragranceFamily(uf)
+    return allFragrances
+      .filter((f) => f.id !== uf.id && getFragranceFamily(f) === family && f.status === "active")
+      .slice(0, 3)
+  }, [uf, allFragrances])
 
   if (isLoading) {
     return (
@@ -61,7 +74,7 @@ export default function FragranceDetailPage({ params }: Props) {
       </button>
 
       {/* Header with scent theming */}
-      <FragranceHeader userFragrance={uf} />
+      <FragranceHeader userFragrance={uf} lastWornAt={lastWornAt ?? null} />
 
       {/* Content sections */}
       <div className="space-y-6 py-6">
@@ -89,6 +102,18 @@ export default function FragranceDetailPage({ params }: Props) {
             <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
               {uf.personal_notes}
             </p>
+          </div>
+        )}
+
+        {/* Similar fragrances in collection */}
+        {similar.length > 0 && (
+          <div className="px-5 space-y-2">
+            <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+              Similar en tu colección
+            </p>
+            {similar.map((f) => (
+              <FragranceCard key={f.id} userFragrance={f} variant="full" />
+            ))}
           </div>
         )}
 

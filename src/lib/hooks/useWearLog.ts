@@ -68,3 +68,44 @@ export function useRecentWears() {
     staleTime: 5 * 60 * 1000,
   })
 }
+
+export function useLastWornByFragrance(userFragranceId: string) {
+  return useQuery({
+    queryKey: queryKeys.wearLog.byFragrance(userFragranceId),
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data } = await supabase
+        .from("wear_logs")
+        .select("worn_at")
+        .eq("user_fragrance_id", userFragranceId)
+        .order("worn_at", { ascending: false })
+        .limit(1)
+        .maybeSingle()
+      return data?.worn_at ?? null
+    },
+    staleTime: 5 * 60 * 1000,
+    enabled: !!userFragranceId,
+  })
+}
+
+export function useLastWornDates() {
+  return useQuery({
+    queryKey: ["wearLog", "lastWornDates"] as const,
+    queryFn: async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return {} as Record<string, string>
+      const { data } = await supabase
+        .from("wear_logs")
+        .select("user_fragrance_id, worn_at")
+        .eq("user_id", user.id)
+        .order("worn_at", { ascending: false })
+      const map: Record<string, string> = {}
+      for (const row of data ?? []) {
+        if (!map[row.user_fragrance_id]) map[row.user_fragrance_id] = row.worn_at
+      }
+      return map
+    },
+    staleTime: 10 * 60 * 1000,
+  })
+}

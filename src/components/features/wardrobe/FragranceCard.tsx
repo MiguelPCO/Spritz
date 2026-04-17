@@ -1,6 +1,5 @@
 import Image from "next/image"
 import Link from "next/link"
-import { Droplets } from "lucide-react"
 import type { UserFragrance } from "@/types/fragrance"
 import {
   getFragranceName,
@@ -13,11 +12,19 @@ import { getScentFamily } from "@/lib/constants/scentFamilies"
 interface FragranceCardProps {
   userFragrance: UserFragrance
   variant?: "compact" | "full"
+  lastWornAt?: string
+}
+
+const STATUS_LABEL: Record<string, string> = {
+  wishlist: "Lista de deseos",
+  empty: "Casi vacía",
+  sold: "Vendida",
 }
 
 export function FragranceCard({
   userFragrance: uf,
   variant = "compact",
+  lastWornAt,
 }: FragranceCardProps) {
   const name = getFragranceName(uf)
   const brand = getFragranceBrand(uf)
@@ -25,6 +32,11 @@ export function FragranceCard({
   const imageUrl = getFragranceImageUrl(uf)
   const familyDef = getScentFamily(family)
   const scentAttr = familyDef.id
+
+  const isNeglected =
+    uf.status === "active" &&
+    (!lastWornAt ||
+      (Date.now() - new Date(lastWornAt).getTime()) / (1000 * 60 * 60 * 24) >= 14)
 
   if (variant === "full") {
     return (
@@ -37,7 +49,7 @@ export function FragranceCard({
           {/* Bottle avatar */}
           <div
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px]"
-            style={{ backgroundColor: imageUrl ? "transparent" : "var(--scent-accent-light)" }}
+            style={{ backgroundColor: "var(--scent-accent-light)" }}
           >
             {imageUrl ? (
               <Image
@@ -48,10 +60,7 @@ export function FragranceCard({
                 className="h-full w-full rounded-[12px] object-cover"
               />
             ) : (
-              <Droplets
-                size={22}
-                style={{ color: "var(--scent-accent)" }}
-              />
+              <span className="text-xl select-none">{familyDef.emoji}</span>
             )}
           </div>
 
@@ -66,6 +75,16 @@ export function FragranceCard({
             <p className="truncate text-xs" style={{ color: "var(--text-secondary)" }}>
               {brand}
             </p>
+            {uf.status !== "active" && STATUS_LABEL[uf.status] && (
+              <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>
+                · {STATUS_LABEL[uf.status]}
+              </span>
+            )}
+            {isNeglected && (
+              <span className="text-[10px] font-medium" style={{ color: "var(--scent-accent)" }}>
+                · Sin usar 14+ días
+              </span>
+            )}
           </div>
 
           {/* Family tag */}
@@ -87,7 +106,7 @@ export function FragranceCard({
       >
         {/* Bottle avatar */}
         <div
-          className="mb-3 flex h-28 w-full items-center justify-center rounded-[12px]"
+          className="relative mb-3 flex h-28 w-full items-center justify-center overflow-hidden rounded-[12px]"
           style={{ backgroundColor: "var(--scent-accent-light)" }}
         >
           {imageUrl ? (
@@ -99,11 +118,34 @@ export function FragranceCard({
               className="h-full w-full rounded-[12px] object-cover"
             />
           ) : (
-            <Droplets
-              size={36}
-              style={{ color: "var(--scent-accent)" }}
-              strokeWidth={1.5}
-            />
+            <span
+              className="text-3xl select-none"
+              style={{ filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.1))" }}
+            >
+              {familyDef.emoji}
+            </span>
+          )}
+
+          {isNeglected && (
+            <span
+              className="absolute top-1.5 left-1.5 rounded-full px-2 py-0.5 text-[9px] font-semibold"
+              style={{ backgroundColor: "var(--scent-accent)", color: "white" }}
+            >
+              ¿La recuerdas?
+            </span>
+          )}
+
+          {uf.status !== "active" && STATUS_LABEL[uf.status] && (
+            <span
+              className="absolute bottom-0 left-0 right-0 py-1 text-center text-[10px] font-medium"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.85)",
+                backdropFilter: "blur(4px)",
+                color: "var(--text-secondary)",
+              }}
+            >
+              {STATUS_LABEL[uf.status]}
+            </span>
           )}
         </div>
 

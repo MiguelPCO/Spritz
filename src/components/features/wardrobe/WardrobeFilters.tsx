@@ -3,10 +3,16 @@
 import { Search, X } from "lucide-react"
 import { SCENT_FAMILIES } from "@/lib/constants/scentFamilies"
 import type { ScentFamily } from "@/lib/constants/scentFamilies"
-import { useWardrobeStore } from "@/lib/stores/wardrobeStore"
+import { useWardrobeStore, type SortBy } from "@/lib/stores/wardrobeStore"
+
+const SORT_OPTIONS: Array<{ id: SortBy; label: string }> = [
+  { id: "date_added", label: "Recientes" },
+  { id: "name", label: "Nombre" },
+  { id: "brand", label: "Marca" },
+]
 
 export function WardrobeFilters() {
-  const { searchQuery, setSearchQuery, activeFilter, setActiveFilter } =
+  const { searchQuery, setSearchQuery, activeFilter, setActiveFilter, sortBy, setSortBy } =
     useWardrobeStore()
 
   return (
@@ -70,6 +76,26 @@ export function WardrobeFilters() {
           >
             <span>{family.emoji}</span>
             <span>{family.labelEs}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Sort chips */}
+      <div className="flex items-center gap-2 px-5 pb-1">
+        <span className="text-[11px] uppercase tracking-widest shrink-0" style={{ color: "var(--text-muted)" }}>
+          Orden
+        </span>
+        {SORT_OPTIONS.map((opt) => (
+          <button
+            key={opt.id}
+            onClick={() => setSortBy(opt.id)}
+            className="rounded-full px-3 py-1 text-xs font-medium transition-colors"
+            style={{
+              backgroundColor: sortBy === opt.id ? "var(--scent-accent)" : "var(--bg-surface)",
+              color: sortBy === opt.id ? "white" : "var(--text-secondary)",
+            }}
+          >
+            {opt.label}
           </button>
         ))}
       </div>

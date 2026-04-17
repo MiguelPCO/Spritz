@@ -10,6 +10,7 @@ import { addToWardrobe } from "@/lib/actions/fragrance.actions"
 import { queryKeys } from "@/lib/constants/queryKeys"
 import type { FragranceCatalogResult } from "@/lib/api/parfumo"
 import { Skeleton } from "@/components/ui/skeleton"
+import { CatalogFragranceCard } from "./CatalogFragranceCard"
 
 export function CrossRecommendations() {
   const { data: wardrobe = [] } = useWardrobe()
@@ -87,35 +88,14 @@ export function CrossRecommendations() {
       <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
         Te podría gustar · {familyDef.emoji} {familyDef.labelEs}
       </p>
-      {results.map((r) => {
-        const rFamily = getScentFamily(r.family)
-        return (
-          <div
-            key={r.id}
-            data-scent={r.family}
-            className="flex items-center gap-3 rounded-[12px] px-4 py-3"
-            style={{ backgroundColor: "var(--bg-surface)" }}
-          >
-            <span className="text-2xl select-none">{rFamily.emoji}</span>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
-                {r.name}
-              </p>
-              <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>
-                {r.brand} · {rFamily.labelEs}
-              </p>
-            </div>
-            <button
-              onClick={() => handleAdd(r)}
-              disabled={isPending}
-              className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-opacity disabled:opacity-50"
-              style={{ backgroundColor: "var(--scent-accent-light)", color: "var(--scent-accent)" }}
-            >
-              + Deseos
-            </button>
-          </div>
-        )
-      })}
+      {results.map((r) => (
+        <CatalogFragranceCard
+          key={r.id}
+          result={r}
+          onAdd={handleAdd}
+          isAdding={isPending}
+        />
+      ))}
     </div>
   )
 }

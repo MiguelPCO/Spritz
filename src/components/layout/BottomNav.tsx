@@ -2,12 +2,12 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { Home, Shirt, Plus, Compass, User } from "lucide-react"
+import { Home, FlaskConical, Plus, Compass, User } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const NAV_ITEMS = [
   { href: "/today",    label: "Hoy",       icon: Home  },
-  { href: "/wardrobe", label: "Colección", icon: Shirt },
+  { href: "/wardrobe", label: "Colección", icon: FlaskConical },
   { href: "/add",      label: "",          icon: Plus  }, // FAB center
   { href: "/discover", label: "Descubrir",  icon: Compass },
   { href: "/profile",  label: "Perfil",    icon: User  },

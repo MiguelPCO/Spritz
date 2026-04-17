@@ -36,7 +36,9 @@ export default function DiscoverPage() {
       <div className="space-y-6 px-5 pb-8 pt-2">
 
         {/* Daily pick */}
-        <DailyFragranceCard />
+        <div className="mb-4">
+          <DailyFragranceCard />
+        </div>
 
         {/* DNA profile */}
         {dominantDef && total >= 3 && (

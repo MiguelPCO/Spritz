@@ -6,10 +6,10 @@ import { toast } from "sonner"
 import { useWardrobe } from "@/lib/hooks/useWardrobe"
 import { useQueryClient } from "@tanstack/react-query"
 import { getFragranceName, getFragranceBrand } from "@/types/fragrance"
-import { getScentFamily } from "@/lib/constants/scentFamilies"
 import { addToWardrobe } from "@/lib/actions/fragrance.actions"
 import { queryKeys } from "@/lib/constants/queryKeys"
 import type { FragranceCatalogResult } from "@/lib/api/parfumo"
+import { CatalogFragranceCard } from "./CatalogFragranceCard"
 
 export function ExternalSearch() {
   const { data: wardrobe = [] } = useWardrobe()
@@ -91,41 +91,15 @@ export function ExternalSearch() {
 
       {results.length > 0 && (
         <div className="space-y-2">
-          {results.map((r) => {
-            const owned = isOwned(r)
-            const rFamily = getScentFamily(r.family)
-            return (
-              <div
-                key={r.id}
-                className="flex items-center gap-3 rounded-[12px] px-4 py-3"
-                style={{ backgroundColor: "var(--bg-surface)", opacity: owned ? 0.6 : 1 }}
-              >
-                <span className="text-xl select-none">{rFamily.emoji}</span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
-                    {r.name}
-                  </p>
-                  <p className="text-xs truncate" style={{ color: "var(--text-muted)" }}>
-                    {r.brand} · {rFamily.labelEs}
-                  </p>
-                </div>
-                {owned ? (
-                  <span className="shrink-0 text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>
-                    En colección
-                  </span>
-                ) : (
-                  <button
-                    onClick={() => handleAdd(r)}
-                    disabled={isPending}
-                    className="shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-opacity disabled:opacity-50"
-                    style={{ backgroundColor: "var(--scent-accent-light)", color: "var(--scent-accent)" }}
-                  >
-                    + Deseos
-                  </button>
-                )}
-              </div>
-            )
-          })}
+          {results.map((r) => (
+            <CatalogFragranceCard
+              key={r.id}
+              result={r}
+              onAdd={handleAdd}
+              isAdding={isPending}
+              isOwned={isOwned(r)}
+            />
+          ))}
         </div>
       )}
 

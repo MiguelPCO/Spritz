@@ -53,6 +53,8 @@ export interface UserFragrance {
   ml_remaining: number | null
   purchase_date: string | null
   purchase_price: number | null
+  wishlist_position: number | null
+  price_target: number | null
 
   // Personal tags
   occasion_tags: string[]

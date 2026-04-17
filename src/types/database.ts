@@ -110,6 +110,8 @@ export type Database = {
           ml_remaining: number | null
           purchase_date: string | null
           purchase_price: number | null
+          wishlist_position: number | null
+          price_target: number | null
           occasion_tags: string[]
           season_tags: string[]
           mood_tags: string[]
@@ -130,6 +132,8 @@ export type Database = {
           ml_remaining?: number | null
           purchase_date?: string | null
           purchase_price?: number | null
+          wishlist_position?: number | null
+          price_target?: number | null
           occasion_tags?: string[]
           season_tags?: string[]
           mood_tags?: string[]
@@ -148,6 +152,8 @@ export type Database = {
           ml_remaining?: number | null
           purchase_date?: string | null
           purchase_price?: number | null
+          wishlist_position?: number | null
+          price_target?: number | null
           occasion_tags?: string[]
           season_tags?: string[]
           mood_tags?: string[]

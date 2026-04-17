@@ -18,6 +18,8 @@ interface AddToWardrobeParams {
   occasionTags?: string[]
   seasonTags?: string[]
   moodTags?: string[]
+  status?: "active" | "empty" | "wishlist" | "sold"
+  priceTarget?: number | null
 }
 
 export async function addToWardrobe(params: AddToWardrobeParams) {
@@ -91,7 +93,8 @@ export async function addToWardrobe(params: AddToWardrobeParams) {
     occasion_tags: params.occasionTags ?? [],
     season_tags: params.seasonTags ?? [],
     mood_tags: params.moodTags ?? [],
-    status: "active",
+    status: params.status ?? "active",
+    price_target: params.priceTarget ?? null,
   })
 
   if (error) {
@@ -105,6 +108,7 @@ export async function addToWardrobe(params: AddToWardrobeParams) {
   }
 
   revalidatePath("/wardrobe")
+  revalidatePath("/discover")
 }
 
 export async function updateFragrance(
@@ -117,6 +121,8 @@ export async function updateFragrance(
     status?: string
     mlRemaining?: number | null
     photoUrl?: string | null
+    priceTarget?: number | null
+    wishlistPosition?: number | null
   }
 ) {
   const supabase = await createSupabaseServerClient()
@@ -133,10 +139,47 @@ export async function updateFragrance(
       status: updates.status,
       ml_remaining: updates.mlRemaining,
       photo_url: updates.photoUrl,
+      price_target: updates.priceTarget,
+      wishlist_position: updates.wishlistPosition,
     })
     .eq("id", id)
     .eq("user_id", session.user.id)
 
   if (error) throw new Error(error.message)
   revalidatePath("/wardrobe")
+}
+
+export async function updateWishlistPositions(
+  positions: Array<{ id: string; position: number }>
+) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error("No autenticado")
+
+  await Promise.all(
+    positions.map(({ id, position }) =>
+      supabase
+        .from("user_fragrances")
+        .update({ wishlist_position: position })
+        .eq("id", id)
+        .eq("user_id", session.user.id)
+    )
+  )
+  revalidatePath("/discover")
+}
+
+export async function deleteFragrance(id: string) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) throw new Error("No autenticado")
+
+  const { error } = await supabase
+    .from("user_fragrances")
+    .delete()
+    .eq("id", id)
+    .eq("user_id", session.user.id)
+
+  if (error) throw new Error(error.message)
+  revalidatePath("/wardrobe")
+  revalidatePath("/discover")
 }

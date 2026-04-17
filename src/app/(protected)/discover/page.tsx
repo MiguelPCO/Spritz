@@ -2,10 +2,13 @@
 
 import { useMemo } from "react"
 import { TopBar } from "@/components/layout/TopBar"
-import { FragranceCard } from "@/components/features/wardrobe/FragranceCard"
 import { useWardrobe } from "@/lib/hooks/useWardrobe"
 import { getFragranceFamily } from "@/types/fragrance"
 import { getScentFamily, SCENT_FAMILIES } from "@/lib/constants/scentFamilies"
+import { DailyFragranceCard } from "@/components/features/discover/DailyFragranceCard"
+import { CrossRecommendations } from "@/components/features/discover/CrossRecommendations"
+import { ExternalSearch } from "@/components/features/discover/ExternalSearch"
+import { WishlistSortable } from "@/components/features/discover/WishlistSortable"
 
 export default function DiscoverPage() {
   const { data: wardrobe = [], isLoading } = useWardrobe()
@@ -32,6 +35,10 @@ export default function DiscoverPage() {
 
       <div className="space-y-6 px-5 pb-8 pt-2">
 
+        {/* Daily pick */}
+        <DailyFragranceCard />
+
+        {/* DNA profile */}
         {dominantDef && total >= 3 && (
           <div
             data-scent={dominantDef.id}
@@ -77,14 +84,19 @@ export default function DiscoverPage() {
           </div>
         )}
 
+        {/* Cross-recommendations */}
+        <CrossRecommendations />
+
+        {/* External fragrance search */}
+        <ExternalSearch />
+
+        {/* Wishlist */}
         {wishlist.length > 0 && (
           <div className="space-y-3">
             <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
               Lista de deseos
             </p>
-            {wishlist.map((uf) => (
-              <FragranceCard key={uf.id} userFragrance={uf} variant="full" />
-            ))}
+            <WishlistSortable wishlist={wishlist} />
           </div>
         )}
 

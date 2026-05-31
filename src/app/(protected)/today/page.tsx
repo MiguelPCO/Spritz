@@ -19,7 +19,7 @@ import { useRecommendation } from "@/lib/hooks/useRecommendation"
 import { useRecommendationStore } from "@/lib/stores/recommendationStore"
 import { logWear } from "@/lib/actions/wear.actions"
 import { getTimeOfDay } from "@/types/weather"
-import { getFragranceName, getFragranceFamily } from "@/types/fragrance"
+import { getFragranceName, getFragranceFamily, getFragranceFamilies } from "@/types/fragrance"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
 import type { UserFragrance } from "@/types/fragrance"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -28,7 +28,7 @@ import Link from "next/link"
 export default function TodayPage() {
   const [wearing, setWearing] = useState(false)
   const [hasRequested, setHasRequested] = useState(false)
-  const { occasion, moods, setOccasion, toggleMood, reset } = useRecommendationStore()
+  const { occasions, moods, freeText, toggleOccasion, toggleMood, setFreeText, reset } = useRecommendationStore()
 
   const { lat, lon } = useGeolocation()
   const { data: weather } = useWeather(lat, lon)
@@ -61,8 +61,9 @@ export default function TodayPage() {
     return {
       weather,
       timeOfDay: getTimeOfDay(),
-      occasion,
+      occasions,
       moods,
+      freeText: freeText.trim() || undefined,
       recentWears: recentWearLogs.map((log) => ({
         fragranceName: log.user_fragrance?.custom_name ?? log.user_fragrance?.fragrance?.name ?? "",
         brand: log.user_fragrance?.custom_brand ?? log.user_fragrance?.fragrance?.brand ?? "",
@@ -74,13 +75,14 @@ export default function TodayPage() {
           id: uf.id,
           name: uf.fragrance?.name ?? uf.custom_name ?? "",
           brand: uf.fragrance?.brand ?? uf.custom_brand ?? "",
-          family: uf.fragrance?.family ?? uf.custom_family ?? "woody",
+          family: getFragranceFamily(uf),
+          families: getFragranceFamilies(uf),
           occasionTags: uf.occasion_tags,
           moodTags: uf.mood_tags,
           topNotes: uf.fragrance?.top_notes ?? [],
         })),
     }
-  }, [wardrobe, recentWearLogs, weather, occasion, moods])
+  }, [wardrobe, recentWearLogs, weather, occasions, moods, freeText])
 
   const { data: recommendation, isLoading: recLoading, refresh } = useRecommendation(
     aiContext,
@@ -97,7 +99,7 @@ export default function TodayPage() {
     try {
       await logWear({
         userFragranceId: recommendedFragrance.id,
-        occasion,
+        occasion: occasions[0] ?? null,
         mood: moods.length > 0 ? moods[0] : null,
         weather: weather ?? null,
         aiRecommended: true,
@@ -216,9 +218,9 @@ export default function TodayPage() {
                   className="text-xs font-medium uppercase tracking-widest"
                   style={{ color: "var(--text-muted)" }}
                 >
-                  Ocasión
+                  Ocasión <span className="normal-case font-normal" style={{ color: "var(--text-muted)" }}>(elige varias)</span>
                 </p>
-                <OccasionSelector value={occasion} onChange={setOccasion} />
+                <OccasionSelector value={occasions} onToggle={toggleOccasion} />
               </div>
 
               <div className="space-y-1">
@@ -234,6 +236,27 @@ export default function TodayPage() {
                   toAdd.forEach(toggleMood)
                   toRemove.forEach(toggleMood)
                 }} />
+              </div>
+
+              <div className="space-y-1">
+                <p
+                  className="text-xs font-medium uppercase tracking-widest"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Algo más que quieras contarme
+                </p>
+                <textarea
+                  value={freeText}
+                  onChange={(e) => setFreeText(e.target.value)}
+                  placeholder="Ej: tengo una reunión importante, voy a salir por la noche…"
+                  rows={2}
+                  className="w-full rounded-[12px] border px-4 py-3 text-sm outline-none resize-none"
+                  style={{
+                    backgroundColor: "var(--bg-page)",
+                    borderColor: "var(--border-subtle)",
+                    color: "var(--text-primary)",
+                  }}
+                />
               </div>
             </div>
 

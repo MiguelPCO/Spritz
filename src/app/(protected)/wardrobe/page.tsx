@@ -11,16 +11,18 @@ export default function WardrobePage() {
   const { data: wardrobe = [], isLoading } = useWardrobe()
   const { data: lastWornDates = {} } = useLastWornDates()
 
+  const collection = wardrobe.filter((uf) => uf.status !== "wishlist")
+
   return (
     <div style={{ backgroundColor: "var(--bg-page)" }}>
       <TopBar
-        title={`Mi Colección${wardrobe.length > 0 ? ` (${wardrobe.length})` : ""}`}
+        title={`Mi Colección${collection.length > 0 ? ` (${collection.length})` : ""}`}
         rightSlot={<ViewToggle />}
       />
 
       <div className="space-y-4 pb-6">
         <WardrobeFilters />
-        <FragranceGrid fragrances={wardrobe} isLoading={isLoading} lastWornDates={lastWornDates} />
+        <FragranceGrid fragrances={collection} isLoading={isLoading} lastWornDates={lastWornDates} />
       </div>
     </div>
   )

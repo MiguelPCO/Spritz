@@ -13,21 +13,23 @@ function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
   // Score each fragrance by simple heuristics
   const scored = ctx.wardrobe.map((f) => {
     let score = 0
-    const family = f.family.toLowerCase()
+    const fams = f.families ?? [f.family]
+
+    const hasFamily = (...ids: string[]) => ids.some((id) => fams.includes(id))
 
     // Temperature preference
-    if (temp < 10 && (family === "oriental" || family === "woody" || family === "amber")) score += 3
-    if (temp >= 10 && temp < 20 && (family === "woody" || family === "floral")) score += 2
-    if (temp >= 20 && (family === "fresh" || family === "green")) score += 3
+    if (temp < 10 && hasFamily("oriental", "woody", "amber", "gourmand", "cuero")) score += 3
+    if (temp >= 10 && temp < 20 && hasFamily("woody", "floral", "fougere", "chipre", "aromatica")) score += 2
+    if (temp >= 20 && hasFamily("fresh", "green", "citrica", "acuatica", "afrutada")) score += 3
 
     // Time of day
-    if (timeOfDay === "morning" && (family === "fresh" || family === "green")) score += 2
-    if (timeOfDay === "evening" && (family === "oriental" || family === "woody" || family === "amber")) score += 2
+    if (timeOfDay === "morning" && hasFamily("fresh", "green", "citrica", "acuatica")) score += 2
+    if (timeOfDay === "evening" && hasFamily("oriental", "woody", "amber", "gourmand", "cuero")) score += 2
 
-    // Occasion match
-    if (ctx.occasion && f.occasionTags.includes(ctx.occasion)) score += 3
+    // Occasion match (any selected occasion)
+    if (ctx.occasions.length > 0 && ctx.occasions.some((o) => f.occasionTags.includes(o))) score += 3
 
-    // Mood match (any of selected moods)
+    // Mood match
     if (ctx.moods.length > 0 && ctx.moods.some((m) => f.moodTags.includes(m))) score += 3
 
     return { f, score }
@@ -43,11 +45,20 @@ function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
     oriental: "Sus notas cálidas y envolventes son perfectas ahora.",
     green: "Su frescura verde es justo lo que necesitas hoy.",
     amber: "Su calidez ambarada complementa perfectamente el día.",
+    citrica: "Sus notas cítricas aportan la energía perfecta para el momento.",
+    fougere: "Su perfil herbáceo y elegante encaja a la perfección.",
+    chipre: "Su sofisticación chiprada es ideal para la ocasión.",
+    gourmand: "Sus notas golosas y cálidas son perfectas para el momento.",
+    aromatica: "Su frescura aromática es justo lo que necesitas ahora.",
+    acuatica: "Sus notas acuáticas aportan ligereza y frescura.",
+    afrutada: "Sus notas afrutadas añaden vitalidad al momento.",
+    cuero: "Su carácter cuero transmite confianza y distinción.",
   }
 
+  const primaryFamily = (pick.families ?? [pick.family])[0] ?? pick.family
   return {
     fragranceId: pick.id,
-    reason: reasons[pick.family] ?? "Una elección perfecta para el momento.",
+    reason: reasons[primaryFamily] ?? "Una elección perfecta para el momento.",
   }
 }
 
@@ -84,8 +95,9 @@ export async function POST(request: Request) {
   const ctx: AIPromptContext = {
     weather: body.weather,
     timeOfDay: body.timeOfDay,
-    occasion: body.occasion ?? null,
+    occasions: body.occasions ?? [],
     moods: body.moods ?? [],
+    freeText: body.freeText,
     recentWears: body.recentWears ?? [],
     wardrobe: body.wardrobe,
   }

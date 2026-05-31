@@ -41,7 +41,7 @@ export function FrequentFragrances({ fragrances }: FrequentFragrancesProps) {
       <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
         Tus favoritas esta semana
       </p>
-      <div className="flex gap-3 overflow-x-auto pb-1 -mx-5 px-5">
+      <div className="flex gap-3 overflow-x-auto pb-1 pt-2 -mx-5 px-5">
         {fragrances.map(({ uf, count }) => {
           const family = getFragranceFamily(uf)
           const familyDef = getScentFamily(family)

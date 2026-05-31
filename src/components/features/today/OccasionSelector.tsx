@@ -4,19 +4,19 @@ import { OCCASIONS } from "@/lib/constants/occasions"
 import { cn } from "@/lib/utils"
 
 interface OccasionSelectorProps {
-  value: string | null
-  onChange: (occasion: string | null) => void
+  value: string[]
+  onToggle: (id: string) => void
 }
 
-export function OccasionSelector({ value, onChange }: OccasionSelectorProps) {
+export function OccasionSelector({ value, onToggle }: OccasionSelectorProps) {
   return (
     <div className="flex flex-wrap gap-2">
       {OCCASIONS.map((occasion) => {
-        const isSelected = value === occasion.id
+        const isSelected = value.includes(occasion.id)
         return (
           <button
             key={occasion.id}
-            onClick={() => onChange(isSelected ? null : occasion.id)}
+            onClick={() => onToggle(occasion.id)}
             className={cn(
               "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all"
             )}

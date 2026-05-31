@@ -10,6 +10,8 @@ import { MOODS } from "@/lib/constants/moods"
 import { useAddFragranceStore } from "@/lib/stores/addFragranceStore"
 import { addToWardrobe } from "@/lib/actions/fragrance.actions"
 import { createClient } from "@/lib/supabase/client"
+import { useQueryClient } from "@tanstack/react-query"
+import { queryKeys } from "@/lib/constants/queryKeys"
 
 const SEASONS = [
   { id: "spring", label: "Primavera", icon: "🌸" },
@@ -59,19 +61,27 @@ function ChipGroup({
 
 export function TagsStep() {
   const router = useRouter()
-  const { draft, setStep, resetDraft } = useAddFragranceStore()
-  const [occasionTags, setOccasionTags] = useState<string[]>([])
-  const [seasonTags, setSeasonTags] = useState<string[]>([])
-  const [moodTags, setMoodTags] = useState<string[]>([])
-  const [personalNotes, setPersonalNotes] = useState("")
-  const [photoUrl, setPhotoUrl] = useState<string | undefined>(undefined)
+  const { draft, setStep, updateDraft, resetDraft } = useAddFragranceStore()
+  const queryClient = useQueryClient()
+  const [occasionTags, setOccasionTags] = useState<string[]>(() => draft.occasionTags)
+  const [seasonTags, setSeasonTags] = useState<string[]>(() => draft.seasonTags)
+  const [moodTags, setMoodTags] = useState<string[]>(() => draft.moodTags)
+  const [personalNotes, setPersonalNotes] = useState(() => draft.personalNotes ?? "")
+  const [photoUrl, setPhotoUrl] = useState<string | undefined>(() => draft.photoUrl ?? undefined)
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [isPending, startTransition] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const submittingRef = useRef(false)
 
-  function toggle(arr: string[], setArr: (v: string[]) => void, id: string) {
-    setArr(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id])
+  function toggle(
+    arr: string[],
+    setArr: (v: string[]) => void,
+    id: string,
+    draftKey: "occasionTags" | "seasonTags" | "moodTags",
+  ) {
+    const next = arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id]
+    setArr(next)
+    updateDraft({ [draftKey]: next })
   }
 
   async function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -101,6 +111,7 @@ export function TagsStep() {
       if (signError || !signedData) throw signError ?? new Error("No se pudo obtener la URL")
 
       setPhotoUrl(signedData.signedUrl)
+      updateDraft({ photoUrl: signedData.signedUrl })
       toast.success("Foto subida correctamente")
     } catch (err) {
       toast.error("Error al subir la foto", {
@@ -121,7 +132,7 @@ export function TagsStep() {
           catalogResult: draft.catalogResult,
           customName: !draft.catalogResult ? draft.name : undefined,
           customBrand: !draft.catalogResult ? draft.brand : undefined,
-          customFamily: !draft.catalogResult ? draft.family : undefined,
+          customFamilies: !draft.catalogResult ? draft.families : undefined,
           customImageUrl: !draft.catalogResult ? draft.imageUrl : undefined,
           customTopNotes: !draft.catalogResult ? draft.topNotes : undefined,
           customMiddleNotes: !draft.catalogResult ? draft.middleNotes : undefined,
@@ -135,6 +146,7 @@ export function TagsStep() {
 
         toast.success(`${draft.name} añadido a la colección`)
         resetDraft()
+        await queryClient.invalidateQueries({ queryKey: queryKeys.wardrobe.all })
         router.push("/wardrobe")
       } catch (err) {
         toast.error("Error al guardar", {
@@ -182,7 +194,7 @@ export function TagsStep() {
               className="h-24 w-24 rounded-[12px] object-cover"
             />
             <button
-              onClick={() => setPhotoUrl(undefined)}
+              onClick={() => { setPhotoUrl(undefined); updateDraft({ photoUrl: undefined }) }}
               className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-white"
             >
               <X size={10} />
@@ -209,21 +221,21 @@ export function TagsStep() {
         label="Ocasión"
         items={OCCASIONS}
         selected={occasionTags}
-        onToggle={(id) => toggle(occasionTags, setOccasionTags, id)}
+        onToggle={(id) => toggle(occasionTags, setOccasionTags, id, "occasionTags")}
       />
 
       <ChipGroup
         label="Temporada"
         items={SEASONS}
         selected={seasonTags}
-        onToggle={(id) => toggle(seasonTags, setSeasonTags, id)}
+        onToggle={(id) => toggle(seasonTags, setSeasonTags, id, "seasonTags")}
       />
 
       <ChipGroup
         label="Estado de ánimo"
         items={MOODS}
         selected={moodTags}
-        onToggle={(id) => toggle(moodTags, setMoodTags, id)}
+        onToggle={(id) => toggle(moodTags, setMoodTags, id, "moodTags")}
       />
 
       {/* Personal notes */}
@@ -238,7 +250,7 @@ export function TagsStep() {
         <textarea
           id="notes"
           value={personalNotes}
-          onChange={(e) => setPersonalNotes(e.target.value)}
+          onChange={(e) => { setPersonalNotes(e.target.value); updateDraft({ personalNotes: e.target.value }) }}
           placeholder="Tu opinión, cuándo la usas, recuerdos…"
           rows={3}
           className="w-full rounded-[12px] border px-4 py-3 text-sm outline-none resize-none"

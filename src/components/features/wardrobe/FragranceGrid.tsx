@@ -3,7 +3,7 @@
 import { FragranceCard } from "./FragranceCard"
 import { useWardrobeStore } from "@/lib/stores/wardrobeStore"
 import type { UserFragrance } from "@/types/fragrance"
-import { getFragranceName, getFragranceBrand, getFragranceFamily } from "@/types/fragrance"
+import { getFragranceName, getFragranceBrand, getFragranceFamilies } from "@/types/fragrance"
 import { Skeleton } from "@/components/ui/skeleton"
 import Link from "next/link"
 import { Plus } from "lucide-react"
@@ -18,7 +18,7 @@ export function FragranceGrid({ fragrances, isLoading, lastWornDates }: Fragranc
   const { viewMode, activeFilter, searchQuery, sortBy } = useWardrobeStore()
 
   const filtered = fragrances.filter((uf) => {
-    if (activeFilter && getFragranceFamily(uf) !== activeFilter) return false
+    if (activeFilter && !getFragranceFamilies(uf).includes(activeFilter)) return false
     if (searchQuery) {
       const q = searchQuery.toLowerCase()
       return (

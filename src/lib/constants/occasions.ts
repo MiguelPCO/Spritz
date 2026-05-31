@@ -10,6 +10,7 @@ export const OCCASIONS: Occasion[] = [
   { id: "date",    label: "Cita",       icon: "💕" },
   { id: "sport",   label: "Deporte",    icon: "🏃" },
   { id: "formal",  label: "Formal",     icon: "🤵" },
+  { id: "day",     label: "Día",        icon: "☀️" },
   { id: "night",   label: "Noche",      icon: "🌙" },
   { id: "outdoor", label: "Exterior",   icon: "🌳" },
 ]

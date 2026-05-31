@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/drawer"
 import { OCCASIONS } from "@/lib/constants/occasions"
 import { MOODS } from "@/lib/constants/moods"
+import { SCENT_FAMILIES } from "@/lib/constants/scentFamilies"
+import type { ScentFamily } from "@/lib/constants/scentFamilies"
 import { updateFragrance } from "@/lib/actions/fragrance.actions"
 import { createClient } from "@/lib/supabase/client"
 import { queryKeys } from "@/lib/constants/queryKeys"
@@ -84,6 +86,7 @@ export function EditFragranceDrawer({ userFragrance: uf, open, onOpenChange }: E
   const queryClient = useQueryClient()
   const [isPending, startTransition] = useTransition()
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const isManual = !uf.fragrance
 
   // Pre-populate from existing data
   const [photoUrl, setPhotoUrl] = useState<string | null>(uf.photo_url)
@@ -96,6 +99,25 @@ export function EditFragranceDrawer({ userFragrance: uf, open, onOpenChange }: E
   const [mlRemaining, setMlRemaining] = useState<string>(
     uf.ml_remaining != null ? String(uf.ml_remaining) : ""
   )
+  // Manual-only fields
+  const [customName, setCustomName] = useState(uf.custom_name ?? "")
+  const [customBrand, setCustomBrand] = useState(uf.custom_brand ?? "")
+  const [customFamilies, setCustomFamilies] = useState<ScentFamily[]>(uf.custom_families ?? [])
+  const [topNotes, setTopNotes] = useState(
+    (uf.custom_notes as { top?: string[] } | null)?.top?.join(", ") ?? ""
+  )
+  const [middleNotes, setMiddleNotes] = useState(
+    (uf.custom_notes as { middle?: string[] } | null)?.middle?.join(", ") ?? ""
+  )
+  const [baseNotes, setBaseNotes] = useState(
+    (uf.custom_notes as { base?: string[] } | null)?.base?.join(", ") ?? ""
+  )
+
+  function toggleFamily(id: ScentFamily) {
+    setCustomFamilies((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    )
+  }
 
   function toggle(arr: string[], setArr: (v: string[]) => void, id: string) {
     setArr(arr.includes(id) ? arr.filter((x) => x !== id) : [...arr, id])
@@ -138,6 +160,14 @@ export function EditFragranceDrawer({ userFragrance: uf, open, onOpenChange }: E
   function handleSave() {
     startTransition(async () => {
       try {
+        const customNotesValue = isManual
+          ? {
+              top: topNotes ? topNotes.split(",").map((n) => n.trim()).filter(Boolean) : [],
+              middle: middleNotes ? middleNotes.split(",").map((n) => n.trim()).filter(Boolean) : [],
+              base: baseNotes ? baseNotes.split(",").map((n) => n.trim()).filter(Boolean) : [],
+            }
+          : undefined
+
         await updateFragrance(uf.id, {
           personalNotes: personalNotes || undefined,
           occasionTags,
@@ -146,6 +176,12 @@ export function EditFragranceDrawer({ userFragrance: uf, open, onOpenChange }: E
           status,
           mlRemaining: mlRemaining !== "" ? Number(mlRemaining) : null,
           photoUrl,
+          ...(isManual && {
+            customName: customName.trim() || (uf.custom_name ?? undefined),
+            customBrand: customBrand.trim() || (uf.custom_brand ?? undefined),
+            customFamilies: customFamilies.length > 0 ? customFamilies : uf.custom_families,
+            customNotes: customNotesValue,
+          }),
         })
         // Invalidate cache so detail + wardrobe list refresh
         queryClient.invalidateQueries({ queryKey: queryKeys.wardrobe.all })
@@ -169,6 +205,111 @@ export function EditFragranceDrawer({ userFragrance: uf, open, onOpenChange }: E
         </DrawerHeader>
 
         <div className="overflow-y-auto px-5 pb-2 space-y-5" style={{ maxHeight: "70vh" }}>
+          {/* Manual-only: name / brand / families / notes */}
+          {isManual && (
+            <>
+              <div className="space-y-1">
+                <label htmlFor="edit-name" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Nombre *
+                </label>
+                <input
+                  id="edit-name"
+                  value={customName}
+                  onChange={(e) => setCustomName(e.target.value)}
+                  placeholder="Ej. Bleu de Chanel"
+                  className="h-11 w-full rounded-[12px] border px-4 text-sm outline-none"
+                  style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="edit-brand" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Marca *
+                </label>
+                <input
+                  id="edit-brand"
+                  value={customBrand}
+                  onChange={(e) => setCustomBrand(e.target.value)}
+                  placeholder="Ej. Chanel"
+                  className="h-11 w-full rounded-[12px] border px-4 text-sm outline-none"
+                  style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Familia olfativa{" "}
+                  <span className="normal-case font-normal" style={{ color: "var(--text-muted)" }}>(elige varias)</span>
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {SCENT_FAMILIES.map((f) => {
+                    const selected = customFamilies.includes(f.id)
+                    return (
+                      <button
+                        key={f.id}
+                        type="button"
+                        onClick={() => toggleFamily(f.id)}
+                        className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                        style={{
+                          backgroundColor: selected ? f.color : "var(--bg-surface)",
+                          color: selected ? "white" : "var(--text-secondary)",
+                          outline: selected ? `2px solid ${f.color}` : "none",
+                          outlineOffset: "1px",
+                        }}
+                      >
+                        {f.emoji} {f.labelEs}
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="edit-top" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Notas de salida
+                </label>
+                <input
+                  id="edit-top"
+                  value={topNotes}
+                  onChange={(e) => setTopNotes(e.target.value)}
+                  placeholder="Limón, Bergamota (separadas por coma)"
+                  className="h-11 w-full rounded-[12px] border px-4 text-sm outline-none"
+                  style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="edit-mid" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Notas de corazón
+                </label>
+                <input
+                  id="edit-mid"
+                  value={middleNotes}
+                  onChange={(e) => setMiddleNotes(e.target.value)}
+                  placeholder="Jazmín, Rosa"
+                  className="h-11 w-full rounded-[12px] border px-4 text-sm outline-none"
+                  style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="edit-base" className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+                  Notas de fondo
+                </label>
+                <input
+                  id="edit-base"
+                  value={baseNotes}
+                  onChange={(e) => setBaseNotes(e.target.value)}
+                  placeholder="Vainilla, Sándalo"
+                  className="h-11 w-full rounded-[12px] border px-4 text-sm outline-none"
+                  style={{ backgroundColor: "var(--bg-surface)", borderColor: "var(--border-subtle)", color: "var(--text-primary)" }}
+                />
+              </div>
+
+              <hr style={{ borderColor: "var(--border-subtle)" }} />
+            </>
+          )}
+
           {/* Photo */}
           <div className="space-y-2">
             <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>

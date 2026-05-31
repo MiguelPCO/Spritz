@@ -1,22 +1,31 @@
 import { create } from "zustand"
 
 interface RecommendationStore {
-  occasion: string | null
+  occasions: string[]
   moods: string[]
-  setOccasion: (occasion: string | null) => void
+  freeText: string
+  toggleOccasion: (id: string) => void
   toggleMood: (id: string) => void
+  setFreeText: (text: string) => void
   reset: () => void
 }
 
 export const useRecommendationStore = create<RecommendationStore>((set) => ({
-  occasion: null,
+  occasions: [],
   moods: [],
-  setOccasion: (occasion) => set({ occasion }),
+  freeText: "",
+  toggleOccasion: (id) =>
+    set((state) => ({
+      occasions: state.occasions.includes(id)
+        ? state.occasions.filter((o) => o !== id)
+        : [...state.occasions, id],
+    })),
   toggleMood: (id) =>
     set((state) => ({
       moods: state.moods.includes(id)
         ? state.moods.filter((m) => m !== id)
         : [...state.moods, id],
     })),
-  reset: () => set({ occasion: null, moods: [] }),
+  setFreeText: (freeText) => set({ freeText }),
+  reset: () => set({ occasions: [], moods: [], freeText: "" }),
 }))

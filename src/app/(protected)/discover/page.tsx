@@ -93,14 +93,27 @@ export default function DiscoverPage() {
         <ExternalSearch />
 
         {/* Wishlist */}
-        {wishlist.length > 0 && (
-          <div className="space-y-3">
-            <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-              Lista de deseos
-            </p>
+        <div className="space-y-3">
+          <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+            Lista de deseos
+          </p>
+          {wishlist.length > 0 ? (
             <WishlistSortable wishlist={wishlist} />
-          </div>
-        )}
+          ) : (
+            <div
+              className="rounded-[16px] py-8 text-center"
+              style={{ backgroundColor: "var(--bg-surface)" }}
+            >
+              <p className="text-2xl mb-2">✨</p>
+              <p className="text-sm font-medium mb-1" style={{ color: "var(--text-primary)" }}>
+                Tu lista de deseos está vacía
+              </p>
+              <p className="text-xs" style={{ color: "var(--text-muted)" }}>
+                Busca fragancias arriba y añádelas aquí
+              </p>
+            </div>
+          )}
+        </div>
 
         {!isLoading && total < 3 && wishlist.length === 0 && (
           <div className="py-16 text-center">

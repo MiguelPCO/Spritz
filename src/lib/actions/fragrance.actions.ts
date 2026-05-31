@@ -8,7 +8,7 @@ interface AddToWardrobeParams {
   catalogResult?: FragranceCatalogResult
   customName?: string
   customBrand?: string
-  customFamily?: string
+  customFamilies?: string[]
   customImageUrl?: string   // URL pasted in ManualEntryForm
   customTopNotes?: string[]
   customMiddleNotes?: string[]
@@ -86,7 +86,7 @@ export async function addToWardrobe(params: AddToWardrobeParams) {
     fragrance_id: fragranceId,
     custom_name: params.customName ?? null,
     custom_brand: params.customBrand ?? null,
-    custom_family: params.customFamily ?? null,
+    custom_families: params.customFamilies ?? [],
     custom_notes: customNotes,
     photo_url: photoUrl,
     personal_notes: params.personalNotes ?? null,
@@ -123,6 +123,11 @@ export async function updateFragrance(
     photoUrl?: string | null
     priceTarget?: number | null
     wishlistPosition?: number | null
+    // Manual entry fields
+    customName?: string
+    customBrand?: string
+    customFamilies?: string[]
+    customNotes?: { top: string[]; middle: string[]; base: string[] } | null
   }
 ) {
   const supabase = await createSupabaseServerClient()
@@ -141,6 +146,10 @@ export async function updateFragrance(
       photo_url: updates.photoUrl,
       price_target: updates.priceTarget,
       wishlist_position: updates.wishlistPosition,
+      ...(updates.customName !== undefined && { custom_name: updates.customName }),
+      ...(updates.customBrand !== undefined && { custom_brand: updates.customBrand }),
+      ...(updates.customFamilies !== undefined && { custom_families: updates.customFamilies }),
+      ...(updates.customNotes !== undefined && { custom_notes: updates.customNotes }),
     })
     .eq("id", id)
     .eq("user_id", session.user.id)

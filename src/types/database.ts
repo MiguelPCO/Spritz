@@ -102,7 +102,7 @@ export type Database = {
           fragrance_id: string | null
           custom_name: string | null
           custom_brand: string | null
-          custom_family: string | null
+          custom_families: string[]
           custom_notes: Json | null
           photo_url: string | null
           personal_notes: string | null
@@ -124,7 +124,7 @@ export type Database = {
           fragrance_id?: string | null
           custom_name?: string | null
           custom_brand?: string | null
-          custom_family?: string | null
+          custom_families?: string[]
           custom_notes?: Json | null
           photo_url?: string | null
           personal_notes?: string | null
@@ -144,7 +144,7 @@ export type Database = {
           fragrance_id?: string | null
           custom_name?: string | null
           custom_brand?: string | null
-          custom_family?: string | null
+          custom_families?: string[]
           custom_notes?: Json | null
           photo_url?: string | null
           personal_notes?: string | null

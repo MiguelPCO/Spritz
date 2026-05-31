@@ -12,56 +12,49 @@ interface CalendarDayProps {
 export function CalendarDay({ date, logs, isCurrentMonth }: CalendarDayProps) {
   const today = isToday(date)
   const hasLogs = logs.length > 0
-  const visibleLogs = logs.slice(0, 3)
-  const extraCount = logs.length - 3
+
+  // Use the most recent wear's family for the circle color
+  const primaryLog = logs[0]
+  const family = primaryLog?.user_fragrance
+    ? getFragranceFamily(primaryLog.user_fragrance)
+    : null
+  const familyDef = family ? getScentFamily(family) : null
 
   return (
-    <div
-      className="flex flex-col items-center gap-1 py-2"
-      aria-label={`${date.getDate()}: ${logs.length} uso${logs.length !== 1 ? "s" : ""}`}
-    >
-      {/* Day number */}
+    <div className="flex flex-col items-center py-1.5">
       <span
-        className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-medium"
-        style={{
-          backgroundColor: today ? "var(--scent-accent)" : "transparent",
-          color: today
-            ? "white"
-            : isCurrentMonth
-            ? "var(--text-primary)"
-            : "var(--text-muted)",
-        }}
+        className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-medium transition-colors"
+        style={
+          hasLogs && familyDef
+            ? {
+                backgroundColor: familyDef.color,
+                color: "white",
+              }
+            : today
+            ? {
+                backgroundColor: "transparent",
+                color: "var(--text-primary)",
+                outline: "2px solid var(--scent-accent)",
+                outlineOffset: "-2px",
+              }
+            : {
+                backgroundColor: "transparent",
+                color: isCurrentMonth ? "var(--text-primary)" : "var(--text-muted)",
+                opacity: isCurrentMonth ? 1 : 0.4,
+              }
+        }
+        aria-label={`${date.getDate()}: ${logs.length} uso${logs.length !== 1 ? "s" : ""}`}
       >
         {date.getDate()}
       </span>
 
-      {/* Dots */}
-      <div className="flex gap-0.5 min-h-[8px]">
-        {visibleLogs.map((log, i) => {
-          const family = log.user_fragrance
-            ? getFragranceFamily(log.user_fragrance)
-            : "woody"
-          const familyDef = getScentFamily(family)
-          return (
-            <span
-              key={i}
-              className="h-2 w-2 rounded-full"
-              style={{ backgroundColor: familyDef.color }}
-              title={log.user_fragrance
-                ? `${log.user_fragrance.fragrance?.name ?? log.user_fragrance.custom_name ?? "?"}`
-                : ""}
-            />
-          )
-        })}
-        {extraCount > 0 && hasLogs && (
-          <span
-            className="text-[9px] font-medium leading-none"
-            style={{ color: "var(--text-muted)" }}
-          >
-            +{extraCount}
-          </span>
-        )}
-      </div>
+      {/* Dot indicator for multiple wears */}
+      {logs.length > 1 && (
+        <span
+          className="mt-0.5 h-1 w-1 rounded-full"
+          style={{ backgroundColor: familyDef?.color ?? "var(--text-muted)" }}
+        />
+      )}
     </div>
   )
 }

@@ -39,7 +39,7 @@ export interface UserFragrance {
   // Manual entry override fields (used when fragrance_id is null)
   custom_name: string | null
   custom_brand: string | null
-  custom_family: ScentFamily | null
+  custom_families: ScentFamily[]
   custom_notes: {
     top: string[]
     middle: string[]
@@ -74,8 +74,15 @@ export function getFragranceBrand(uf: UserFragrance): string {
   return uf.fragrance?.brand ?? uf.custom_brand ?? ""
 }
 
+/** All families for a fragrance (1 for catalog, ≥1 for manual entries). */
+export function getFragranceFamilies(uf: UserFragrance): ScentFamily[] {
+  if (uf.fragrance?.family) return [uf.fragrance.family]
+  return uf.custom_families.length > 0 ? uf.custom_families : ["woody"]
+}
+
+/** Primary family — used for theming/color (always returns one value). */
 export function getFragranceFamily(uf: UserFragrance): ScentFamily {
-  return uf.fragrance?.family ?? uf.custom_family ?? "woody"
+  return getFragranceFamilies(uf)[0]
 }
 
 export function getFragranceImageUrl(uf: UserFragrance): string | null {

@@ -27,14 +27,14 @@ const FIELDS = [
 ]
 
 export function ManualEntryForm() {
-  const { updateDraft, setStep } = useAddFragranceStore()
-  const [name, setName] = useState("")
-  const [brand, setBrand] = useState("")
-  const [family, setFamily] = useState<ScentFamily>("woody")
-  const [topNotes, setTopNotes] = useState("")
-  const [middleNotes, setMiddleNotes] = useState("")
-  const [baseNotes, setBaseNotes] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
+  const { draft, updateDraft, setStep } = useAddFragranceStore()
+  const [name, setName] = useState(() => draft.name ?? "")
+  const [brand, setBrand] = useState(() => draft.brand ?? "")
+  const [families, setFamilies] = useState<ScentFamily[]>(() => draft.families ?? [])
+  const [topNotes, setTopNotes] = useState(() => draft.topNotes?.join(", ") ?? "")
+  const [middleNotes, setMiddleNotes] = useState(() => draft.middleNotes?.join(", ") ?? "")
+  const [baseNotes, setBaseNotes] = useState(() => draft.baseNotes?.join(", ") ?? "")
+  const [imageUrl, setImageUrl] = useState(() => draft.imageUrl ?? "")
 
   const values: Record<string, string> = { name, brand, top: topNotes, mid: middleNotes, base: baseNotes, imageUrl }
   const setters: Record<string, (v: string) => void> = {
@@ -42,12 +42,18 @@ export function ManualEntryForm() {
     mid: setMiddleNotes, base: setBaseNotes, imageUrl: setImageUrl,
   }
 
+  function toggleFamily(id: ScentFamily) {
+    setFamilies((prev) =>
+      prev.includes(id) ? prev.filter((f) => f !== id) : [...prev, id]
+    )
+  }
+
   function handleNext() {
-    if (!name.trim() || !brand.trim()) return
+    if (!name.trim() || !brand.trim() || families.length === 0) return
     updateDraft({
       name,
       brand,
-      family,
+      families,
       imageUrl: imageUrl.trim() || undefined,
       topNotes: topNotes ? topNotes.split(",").map((n) => n.trim()).filter(Boolean) : [],
       middleNotes: middleNotes ? middleNotes.split(",").map((n) => n.trim()).filter(Boolean) : [],
@@ -100,26 +106,40 @@ export function ManualEntryForm() {
         </div>
       ))}
 
-      {/* Family selector */}
+      {/* Family selector — multi-select */}
       <div className="space-y-2">
         <p className="text-sm font-medium" style={{ color: "var(--text-primary)" }}>
-          Familia olfativa
+          Familia olfativa{" "}
+          <span className="text-xs font-normal" style={{ color: "var(--text-secondary)" }}>
+            (puedes elegir varias)
+          </span>
         </p>
         <div className="flex flex-wrap gap-2">
-          {SCENT_FAMILIES.map((f) => (
-            <button
-              key={f.id}
-              onClick={() => setFamily(f.id)}
-              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
-              style={{
-                backgroundColor: family === f.id ? f.color : "var(--bg-surface)",
-                color: family === f.id ? "white" : "var(--text-secondary)",
-              }}
-            >
-              {f.emoji} {f.labelEs}
-            </button>
-          ))}
+          {SCENT_FAMILIES.map((f) => {
+            const selected = families.includes(f.id)
+            return (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => toggleFamily(f.id)}
+                className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                style={{
+                  backgroundColor: selected ? f.color : "var(--bg-surface)",
+                  color: selected ? "white" : "var(--text-secondary)",
+                  outline: selected ? `2px solid ${f.color}` : "none",
+                  outlineOffset: "1px",
+                }}
+              >
+                {f.emoji} {f.labelEs}
+              </button>
+            )
+          })}
         </div>
+        {families.length === 0 && (
+          <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+            Selecciona al menos una familia
+          </p>
+        )}
       </div>
 
       <div className="flex gap-3 pt-2">
@@ -132,7 +152,7 @@ export function ManualEntryForm() {
         </button>
         <button
           onClick={handleNext}
-          disabled={!name.trim() || !brand.trim()}
+          disabled={!name.trim() || !brand.trim() || families.length === 0}
           className="h-11 flex-1 rounded-[12px] text-sm font-medium text-white disabled:opacity-50"
           style={{ backgroundColor: "var(--scent-accent)" }}
         >

@@ -17,7 +17,7 @@ function buildPrompt(ctx: AIPromptContext): string {
   const wardrobeList = ctx.wardrobe
     .map(
       (f) =>
-        `  - ID:${f.id} | ${f.brand} ${f.name} | Familia:${f.family}` +
+        `  - ID:${f.id} | ${f.brand} ${f.name} | Familias:${(f.families ?? [f.family]).join(",")}` +
         (f.occasionTags.length > 0 ? ` | Ocasiones:${f.occasionTags.join(",")}` : "") +
         (f.moodTags.length > 0 ? ` | Estado:${f.moodTags.join(",")}` : "") +
         (f.topNotes.length > 0 ? ` | Notas:${f.topNotes.slice(0, 3).join(",")}` : "")
@@ -29,8 +29,8 @@ function buildPrompt(ctx: AIPromptContext): string {
 CONTEXTO:
 - Tiempo: ${ctx.weather.temp}°C, ${ctx.weather.description}, humedad ${ctx.weather.humidity}%
 - Momento del día: ${timeLabel}
-- Ocasión: ${ctx.occasion ?? "Sin especificar"}
-- Estado de ánimo: ${ctx.moods.length > 0 ? ctx.moods.join(", ") : "Sin especificar"}
+- Ocasión: ${ctx.occasions.length > 0 ? ctx.occasions.join(", ") : "Sin especificar"}
+- Estado de ánimo: ${ctx.moods.length > 0 ? ctx.moods.join(", ") : "Sin especificar"}${ctx.freeText ? `\n- Contexto adicional: ${ctx.freeText}` : ""}
 
 USOS RECIENTES (evita repetir si es posible):
 ${recentList}

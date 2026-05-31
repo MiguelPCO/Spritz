@@ -203,6 +203,70 @@
   --shadow-glow:         0 0 20px rgba(232, 185, 74, 0.15);
 }
 
+[data-scent="citrica"] {
+  --scent-accent:        #C8B000;
+  --scent-accent-light:  #FBF6C0;
+  --scent-accent-muted:  #A89400;
+  --scent-accent-dark:   #7A6B00;
+  --shadow-glow:         0 0 20px rgba(200, 176, 0, 0.15);
+}
+
+[data-scent="fougere"] {
+  --scent-accent:        #3D6B5A;
+  --scent-accent-light:  #DCF0E8;
+  --scent-accent-muted:  #5A8A74;
+  --scent-accent-dark:   #1E4438;
+  --shadow-glow:         0 0 20px rgba(61, 107, 90, 0.15);
+}
+
+[data-scent="chipre"] {
+  --scent-accent:        #6E7D3A;
+  --scent-accent-light:  #EBF0DA;
+  --scent-accent-muted:  #8A9C52;
+  --scent-accent-dark:   #465028;
+  --shadow-glow:         0 0 20px rgba(110, 125, 58, 0.15);
+}
+
+[data-scent="gourmand"] {
+  --scent-accent:        #B5652A;
+  --scent-accent-light:  #FAE8D8;
+  --scent-accent-muted:  #CC7F44;
+  --scent-accent-dark:   #7A3F10;
+  --shadow-glow:         0 0 20px rgba(181, 101, 42, 0.15);
+}
+
+[data-scent="aromatica"] {
+  --scent-accent:        #7A6BAA;
+  --scent-accent-light:  #EDE8F8;
+  --scent-accent-muted:  #9588C0;
+  --scent-accent-dark:   #50408A;
+  --shadow-glow:         0 0 20px rgba(122, 107, 170, 0.15);
+}
+
+[data-scent="acuatica"] {
+  --scent-accent:        #3B88C4;
+  --scent-accent-light:  #DCF0FA;
+  --scent-accent-muted:  #5AA0D8;
+  --scent-accent-dark:   #1A5C90;
+  --shadow-glow:         0 0 20px rgba(59, 136, 196, 0.15);
+}
+
+[data-scent="afrutada"] {
+  --scent-accent:        #D4774A;
+  --scent-accent-light:  #FAE8DC;
+  --scent-accent-muted:  #E0906A;
+  --scent-accent-dark:   #9A4020;
+  --shadow-glow:         0 0 20px rgba(212, 119, 74, 0.15);
+}
+
+[data-scent="cuero"] {
+  --scent-accent:        #8B5E3C;
+  --scent-accent-light:  #F0E4D8;
+  --scent-accent-muted:  #A87858;
+  --scent-accent-dark:   #5A3420;
+  --shadow-glow:         0 0 20px rgba(139, 94, 60, 0.15);
+}
+
 /* ─────────────────────────────────────────────────────────────────────────────
    KEYFRAMES
 ───────────────────────────────────────────────────────────────────────────── */
@@ -280,6 +344,14 @@ h1, h2, h3, h4, h5, h6 {
 .scent-tag-oriental { background-color: #EEEAFC; color: #5A419E; }
 .scent-tag-green    { background-color: #E8F3E4; color: #3D7832; }
 .scent-tag-amber    { background-color: #FBF3E0; color: #C49A2E; }
+.scent-tag-citrica  { background-color: #FBF6C0; color: #7A6B00; }
+.scent-tag-fougere  { background-color: #DCF0E8; color: #1E4438; }
+.scent-tag-chipre   { background-color: #EBF0DA; color: #465028; }
+.scent-tag-gourmand { background-color: #FAE8D8; color: #7A3F10; }
+.scent-tag-aromatica { background-color: #EDE8F8; color: #50408A; }
+.scent-tag-acuatica { background-color: #DCF0FA; color: #1A5C90; }
+.scent-tag-afrutada { background-color: #FAE8DC; color: #9A4020; }
+.scent-tag-cuero    { background-color: #F0E4D8; color: #5A3420; }
 
 /* ─────────────────────────────────────────────────────────────────────────────
    MOBILE-FIRST APP SHELL

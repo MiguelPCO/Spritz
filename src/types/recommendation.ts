@@ -5,8 +5,9 @@ import type { UserFragrance } from "./fragrance"
 export interface AIPromptContext {
   weather: WeatherData
   timeOfDay: TimeOfDay
-  occasion: string | null
+  occasions: string[]
   moods: string[]
+  freeText?: string
   recentWears: Array<{
     fragranceName: string
     brand: string
@@ -17,6 +18,7 @@ export interface AIPromptContext {
     name: string
     brand: string
     family: string
+    families: string[]
     occasionTags: string[]
     moodTags: string[]
     topNotes: string[]

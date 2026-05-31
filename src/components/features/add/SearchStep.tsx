@@ -1,39 +1,70 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
-import { Search, Loader2, PenLine, Droplets } from "lucide-react"
-import { searchFragrances, type FragranceCatalogResult } from "@/lib/api/parfumo"
+import { Search, Loader2, PenLine, Droplets, Sparkles } from "lucide-react"
+import type { FragranceCatalogResult } from "@/lib/api/parfumo"
 import { useAddFragranceStore } from "@/lib/stores/addFragranceStore"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
+
+type SearchSource = "seed" | "ai" | "empty" | null
 
 export function SearchStep() {
   const { setStep, updateDraft } = useAddFragranceStore()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<FragranceCatalogResult[]>([])
+  const [source, setSource] = useState<SearchSource>(null)
   const [searching, setSearching] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const lastQuery = useRef("")
 
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    if (!query.trim()) return
+  async function doSearch(q: string) {
+    const trimmed = q.trim()
+    if (!trimmed || trimmed === lastQuery.current) return
+    lastQuery.current = trimmed
     setSearching(true)
-    const found = await searchFragrances(query)
-    setResults(found)
-    setSearching(false)
+    try {
+      const res = await fetch(`/api/fragrance-search?q=${encodeURIComponent(trimmed)}`)
+      const data = (await res.json()) as { results: FragranceCatalogResult[]; source: SearchSource }
+      setResults(data.results ?? [])
+      setSource(data.source ?? "empty")
+    } catch {
+      setResults([])
+      setSource("empty")
+    } finally {
+      setSearching(false)
+    }
   }
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setResults([])
+      setSource(null)
+      lastQuery.current = ""
+      return
+    }
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    debounceRef.current = setTimeout(() => doSearch(query), 350)
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query])
 
   function handleSelect(result: FragranceCatalogResult) {
     updateDraft({
       catalogResult: result,
       name: result.name,
       brand: result.brand,
-      family: result.family as Parameters<typeof updateDraft>[0]["family"],
       topNotes: result.topNotes,
       middleNotes: result.middleNotes,
       baseNotes: result.baseNotes,
     })
     setStep("tags")
   }
+
+  const hasQuery = query.trim().length > 0
+  const showEmpty = hasQuery && !searching && source !== null && results.length === 0
 
   return (
     <div className="space-y-4">
@@ -49,29 +80,38 @@ export function SearchStep() {
         </p>
       </div>
 
-      {/* Search form */}
-      <form onSubmit={handleSearch} className="flex gap-2">
+      {/* Search input — debounce auto-search */}
+      <div className="relative">
         <input
           type="search"
           placeholder="Ej. Bleu de Chanel"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="h-11 flex-1 rounded-[12px] border px-4 text-sm outline-none"
+          className="h-11 w-full rounded-[12px] border pl-4 pr-10 text-sm outline-none"
           style={{
             backgroundColor: "var(--bg-surface)",
             borderColor: "var(--border-subtle)",
             color: "var(--text-primary)",
           }}
         />
-        <button
-          type="submit"
-          disabled={searching}
-          className="flex h-11 w-11 items-center justify-center rounded-[12px] text-white"
-          style={{ backgroundColor: "var(--scent-accent)" }}
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          {searching
+            ? <Loader2 size={16} className="animate-spin" style={{ color: "var(--text-muted)" }} />
+            : <Search size={16} style={{ color: "var(--text-muted)" }} />
+          }
+        </div>
+      </div>
+
+      {/* AI fallback badge */}
+      {source === "ai" && results.length > 0 && (
+        <div
+          className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium w-fit"
+          style={{ backgroundColor: "var(--scent-accent-light)", color: "var(--scent-accent)" }}
         >
-          {searching ? <Loader2 size={18} className="animate-spin" /> : <Search size={18} />}
-        </button>
-      </form>
+          <Sparkles size={12} />
+          Resultados ampliados con IA
+        </div>
+      )}
 
       {/* Results */}
       {results.length > 0 && (
@@ -126,13 +166,13 @@ export function SearchStep() {
         </div>
       )}
 
-      {results.length === 0 && query && !searching && (
-        <p className="text-sm text-center" style={{ color: "var(--text-muted)" }}>
+      {showEmpty && (
+        <p className="text-sm text-center py-2" style={{ color: "var(--text-muted)" }}>
           Sin resultados. ¿Quieres añadirla manualmente?
         </p>
       )}
 
-      {/* Manual entry option */}
+      {/* Manual entry */}
       <button
         onClick={() => setStep("manual")}
         className="flex w-full items-center justify-center gap-2 rounded-[12px] py-3 text-sm font-medium transition-colors"

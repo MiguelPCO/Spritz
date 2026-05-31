@@ -5,6 +5,7 @@ import {
   getFragranceName,
   getFragranceBrand,
   getFragranceFamily,
+  getFragranceFamilies,
   getFragranceImageUrl,
 } from "@/types/fragrance"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
@@ -29,6 +30,7 @@ export function FragranceCard({
   const name = getFragranceName(uf)
   const brand = getFragranceBrand(uf)
   const family = getFragranceFamily(uf)
+  const families = getFragranceFamilies(uf)
   const imageUrl = getFragranceImageUrl(uf)
   const familyDef = getScentFamily(family)
   const scentAttr = familyDef.id
@@ -87,10 +89,17 @@ export function FragranceCard({
             )}
           </div>
 
-          {/* Family tag */}
-          <span className={`scent-tag scent-tag-${scentAttr} shrink-0`}>
-            {familyDef.emoji}
-          </span>
+          {/* Family tags */}
+          <div className="flex shrink-0 flex-col gap-1 items-end">
+            {families.map((fid) => {
+              const fd = getScentFamily(fid)
+              return (
+                <span key={fid} className={`scent-tag scent-tag-${fd.id}`}>
+                  {fd.emoji}
+                </span>
+              )
+            })}
+          </div>
         </div>
       </Link>
     )
@@ -159,10 +168,15 @@ export function FragranceCard({
         <p className="truncate text-xs mt-0.5" style={{ color: "var(--text-secondary)" }}>
           {brand}
         </p>
-        <div className="mt-2">
-          <span className={`scent-tag scent-tag-${scentAttr}`}>
-            {familyDef.emoji} {familyDef.labelEs}
-          </span>
+        <div className="mt-2 flex flex-wrap gap-1">
+          {families.map((fid) => {
+            const fd = getScentFamily(fid)
+            return (
+              <span key={fid} className={`scent-tag scent-tag-${fd.id}`}>
+                {fd.emoji} {fd.labelEs}
+              </span>
+            )
+          })}
         </div>
       </div>
     </Link>

@@ -7,7 +7,7 @@ import { CSS } from "@dnd-kit/utilities"
 import { GripVertical, Target } from "lucide-react"
 import { toast } from "sonner"
 import { useQueryClient } from "@tanstack/react-query"
-import { getFragranceName, getFragranceBrand, getFragranceFamily } from "@/types/fragrance"
+import { getFragranceName, getFragranceBrand, getFragranceFamily, getFragranceImageUrl } from "@/types/fragrance"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
 import { updateFragrance } from "@/lib/actions/fragrance.actions"
 import { queryKeys } from "@/lib/constants/queryKeys"
@@ -23,9 +23,12 @@ export function WishlistItem({ userFragrance: uf }: WishlistItemProps) {
   const [editingPrice, setEditingPrice] = useState(false)
   const [priceInput, setPriceInput] = useState(uf.price_target?.toString() ?? "")
   const [, startTransition] = useTransition()
+  const [imgError, setImgError] = useState(false)
 
   const family = getFragranceFamily(uf)
   const familyDef = getScentFamily(family)
+  const imageUrl = getFragranceImageUrl(uf)
+  const showImage = imageUrl && !imgError
 
   const containerStyle = {
     transform: CSS.Transform.toString(transform),
@@ -64,7 +67,22 @@ export function WishlistItem({ userFragrance: uf }: WishlistItemProps) {
         <GripVertical size={16} />
       </button>
 
-      <span className="text-xl select-none shrink-0">{familyDef.emoji}</span>
+      <div
+        className="shrink-0 flex h-10 w-10 items-center justify-center rounded-[10px] overflow-hidden"
+        style={{ backgroundColor: "var(--scent-accent-light)" }}
+      >
+        {showImage ? (
+          <img
+            src={imageUrl!}
+            alt={getFragranceName(uf)}
+            className="h-full w-full object-cover"
+            loading="lazy"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <span className="text-lg select-none">{familyDef.emoji}</span>
+        )}
+      </div>
 
       <Link href={`/wardrobe/${uf.id}`} className="flex-1 min-w-0">
         <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>

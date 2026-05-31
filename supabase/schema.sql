@@ -12,7 +12,9 @@ create extension if not exists "uuid-ossp";
 -- ─────────────────────────────────────────
 do $$ begin
   create type scent_family as enum (
-    'woody', 'fresh', 'floral', 'oriental', 'green', 'amber'
+    'woody', 'fresh', 'floral', 'oriental', 'green', 'amber',
+    'citrica', 'fougere', 'chipre', 'gourmand',
+    'aromatica', 'acuatica', 'afrutada', 'cuero'
   );
 exception when duplicate_object then null; end $$;
 
@@ -142,7 +144,7 @@ create table if not exists public.user_fragrances (
   -- Custom entry fields (used when fragrance_id is null)
   custom_name     text,
   custom_brand    text,
-  custom_family   text,
+  custom_families text[] default '{}',
   custom_notes    jsonb default '{}'::jsonb,
   -- shape: { top: string[], middle: string[], base: string[] }
 

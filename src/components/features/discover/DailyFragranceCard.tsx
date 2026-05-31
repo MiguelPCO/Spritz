@@ -4,7 +4,7 @@ import { useMemo } from "react"
 import Link from "next/link"
 import { useWardrobe } from "@/lib/hooks/useWardrobe"
 import { useLastWornDates } from "@/lib/hooks/useWearLog"
-import { getFragranceName, getFragranceBrand, getFragranceFamily } from "@/types/fragrance"
+import { getFragranceName, getFragranceBrand, getFragranceFamily, getFragranceImageUrl } from "@/types/fragrance"
 import { getScentFamily } from "@/lib/constants/scentFamilies"
 import { getCurrentSeason } from "@/lib/utils/seasonUtils"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -56,6 +56,7 @@ export function DailyFragranceCard() {
   const family = getFragranceFamily(pick)
   const familyDef = getScentFamily(family)
   const season = getCurrentSeason()
+  const imageUrl = getFragranceImageUrl(pick)
 
   return (
     <Link href={`/wardrobe/${pick.id}`}>
@@ -67,7 +68,21 @@ export function DailyFragranceCard() {
           border: "1px solid color-mix(in srgb, var(--scent-accent) 20%, transparent)",
         }}
       >
-        <span className="text-3xl select-none">{familyDef.emoji}</span>
+        <div
+          className="shrink-0 flex h-14 w-14 items-center justify-center rounded-[12px] overflow-hidden"
+          style={{ backgroundColor: "color-mix(in srgb, var(--scent-accent) 15%, transparent)" }}
+        >
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={getFragranceName(pick)}
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+          ) : (
+            <span className="text-3xl select-none">{familyDef.emoji}</span>
+          )}
+        </div>
         <div className="flex-1 min-w-0">
           <p
             className="text-[10px] font-medium uppercase tracking-widest mb-0.5"

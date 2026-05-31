@@ -10,7 +10,7 @@ interface DraftFragrance {
   // Manual entry / overrides
   name?: string
   brand?: string
-  family?: ScentFamily
+  families?: ScentFamily[]
   topNotes?: string[]
   middleNotes?: string[]
   baseNotes?: string[]

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { searchFragrances } from "@/lib/api/parfumo"
 import type { FragranceCatalogResult } from "@/lib/api/parfumo"
 import Anthropic from "@anthropic-ai/sdk"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 const VALID_FAMILIES = new Set([
   "fresh", "floral", "oriental", "woody", "green", "amber",
@@ -68,8 +69,13 @@ Si no hay ninguna fragancia real que coincida, devuelve [].`,
 }
 
 export async function GET(request: NextRequest) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
   const q = request.nextUrl.searchParams.get("q") ?? ""
   if (!q.trim()) return NextResponse.json({ results: [], source: "seed" })
+  if (q.length > 200) return NextResponse.json({ results: [], source: "empty" }, { status: 400 })
 
   const seedResults = await searchFragrances(q)
 

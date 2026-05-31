@@ -29,21 +29,13 @@ export async function addToWardrobe(params: AddToWardrobeParams) {
 
   let fragranceId: string | null = null
 
-  // If we have a catalog result, upsert into the public fragrances table first
+  // Upsert catalog fragrance atomically (avoids TOCTOU race on external_id)
   if (params.catalogResult) {
     const cat = params.catalogResult
-    const { data: existing } = await supabase
+    const { data: upserted, error } = await supabase
       .from("fragrances")
-      .select("id")
-      .eq("external_id", cat.id)
-      .maybeSingle()
-
-    if (existing) {
-      fragranceId = existing.id
-    } else {
-      const { data: inserted, error } = await supabase
-        .from("fragrances")
-        .insert({
+      .upsert(
+        {
           name: cat.name,
           brand: cat.brand,
           family: cat.family,
@@ -55,13 +47,14 @@ export async function addToWardrobe(params: AddToWardrobeParams) {
           external_id: cat.id,
           gender: cat.gender,
           year_released: cat.year,
-        })
-        .select("id")
-        .single()
+        },
+        { onConflict: "external_id", ignoreDuplicates: false }
+      )
+      .select("id")
+      .single()
 
-      if (error) throw new Error(error.message)
-      fragranceId = inserted.id
-    }
+    if (error) throw new Error(error.message)
+    fragranceId = upserted.id
   }
 
   // Build custom_notes for manual entries
@@ -165,7 +158,7 @@ export async function updateWishlistPositions(
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) throw new Error("No autenticado")
 
-  await Promise.all(
+  const results = await Promise.all(
     positions.map(({ id, position }) =>
       supabase
         .from("user_fragrances")
@@ -174,6 +167,8 @@ export async function updateWishlistPositions(
         .eq("user_id", session.user.id)
     )
   )
+  const failed = results.filter((r) => r.error)
+  if (failed.length > 0) throw new Error(failed[0].error!.message)
   revalidatePath("/discover")
 }
 

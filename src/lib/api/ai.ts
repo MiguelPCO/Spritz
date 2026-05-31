@@ -4,6 +4,29 @@ import { getTimeOfDayLabel } from "@/types/weather"
 
 const MODEL = "claude-haiku-4-5-20251001"
 
+// Singleton — avoids creating a new HTTP agent per request (#10)
+const anthropicClient = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null
+
+function sanitizeUserText(text: string, maxLen = 300): string {
+  return text
+    .replace(/[\n\r]/g, " ")
+    .replace(/[|{}"]/g, "")
+    .trim()
+    .slice(0, maxLen)
+}
+
+function validateAndNormalize(
+  parsed: AIRecommendationResponse,
+  ctx: AIPromptContext
+): AIRecommendationResponse {
+  const exists = ctx.wardrobe.some((f) => f.id === parsed.fragranceId)
+  const fragranceId = exists ? parsed.fragranceId : ctx.wardrobe[0].id
+  const reason = parsed.reason ? String(parsed.reason).slice(0, 400) : "Una elección perfecta para el momento."
+  return { fragranceId, reason }
+}
+
 function buildPrompt(ctx: AIPromptContext): string {
   const timeLabel = getTimeOfDayLabel(ctx.timeOfDay)
 
@@ -30,7 +53,7 @@ CONTEXTO:
 - Tiempo: ${ctx.weather.temp}°C, ${ctx.weather.description}, humedad ${ctx.weather.humidity}%
 - Momento del día: ${timeLabel}
 - Ocasión: ${ctx.occasions.length > 0 ? ctx.occasions.join(", ") : "Sin especificar"}
-- Estado de ánimo: ${ctx.moods.length > 0 ? ctx.moods.join(", ") : "Sin especificar"}${ctx.freeText ? `\n- Contexto adicional: ${ctx.freeText}` : ""}
+- Estado de ánimo: ${ctx.moods.length > 0 ? ctx.moods.join(", ") : "Sin especificar"}${ctx.freeText ? `\n- Contexto adicional: ${sanitizeUserText(ctx.freeText)}` : ""}
 
 USOS RECIENTES (evita repetir si es posible):
 ${recentList}
@@ -49,11 +72,9 @@ export async function generateRecommendation(
     throw new Error("El armario está vacío")
   }
 
-  const client = new Anthropic({
-    apiKey: process.env.ANTHROPIC_API_KEY,
-  })
+  if (!anthropicClient) throw new Error("ANTHROPIC_API_KEY no configurada")
 
-  const message = await client.messages.create({
+  const message = await anthropicClient.messages.create({
     model: MODEL,
     max_tokens: 256,
     system:
@@ -71,22 +92,13 @@ export async function generateRecommendation(
     if (!parsed.fragranceId || !parsed.reason) {
       throw new Error("Respuesta de IA con formato incorrecto")
     }
-    // Validate the returned fragranceId exists in the wardrobe
-    const exists = ctx.wardrobe.some((f) => f.id === parsed.fragranceId)
-    if (!exists) {
-      // Fallback: return first fragrance in wardrobe
-      return {
-        fragranceId: ctx.wardrobe[0].id,
-        reason: parsed.reason,
-      }
-    }
-    return parsed
+    return validateAndNormalize(parsed, ctx)
   } catch {
     // Parsing failed — try to extract JSON from response
     const jsonMatch = textContent.text.match(/\{[^}]+\}/)
     if (jsonMatch) {
       const fallback = JSON.parse(jsonMatch[0]) as AIRecommendationResponse
-      return fallback
+      return validateAndNormalize(fallback, ctx)
     }
     throw new Error("No se pudo parsear la respuesta de la IA")
   }

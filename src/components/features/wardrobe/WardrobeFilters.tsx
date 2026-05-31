@@ -26,6 +26,7 @@ export function WardrobeFilters() {
         />
         <input
           type="search"
+          aria-label="Buscar fragancia"
           placeholder="Buscar fragancia…"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -40,8 +41,9 @@ export function WardrobeFilters() {
           <button
             onClick={() => setSearchQuery("")}
             className="absolute right-3 top-1/2 -translate-y-1/2"
+            aria-label="Limpiar búsqueda"
           >
-            <X size={14} style={{ color: "var(--text-muted)" }} />
+            <X size={14} aria-hidden="true" style={{ color: "var(--text-muted)" }} />
           </button>
         )}
       </div>

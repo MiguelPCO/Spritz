@@ -75,6 +75,8 @@ export function WishlistItem({ userFragrance: uf }: WishlistItemProps) {
           <img
             src={imageUrl!}
             alt={getFragranceName(uf)}
+            width={40}
+            height={40}
             className="h-full w-full object-cover"
             loading="lazy"
             onError={() => setImgError(true)}

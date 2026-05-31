@@ -119,6 +119,8 @@ export function CatalogFragranceCard({ result, onAdd, isAdding, isOwned }: Catal
                 <img
                   src={result.imageUrl!}
                   alt={result.name}
+                  width={400}
+                  height={200}
                   className="h-full w-full object-contain"
                   onError={() => setImgError(true)}
                 />

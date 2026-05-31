@@ -65,9 +65,9 @@ export function DetailActions({ userFragrance, fragranceName }: DetailActionsPro
           onClick={() => setEditOpen(true)}
           className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[12px] transition-colors"
           style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-secondary)" }}
-          title="Editar fragancia"
+          aria-label="Editar fragancia"
         >
-          <Pencil size={18} />
+          <Pencil size={18} aria-hidden="true" />
         </button>
 
         <button
@@ -78,9 +78,9 @@ export function DetailActions({ userFragrance, fragranceName }: DetailActionsPro
             backgroundColor: confirmDelete ? "#C03A3A" : "var(--bg-surface)",
             color: confirmDelete ? "white" : "var(--text-muted)",
           }}
-          title={confirmDelete ? "¿Confirmar eliminación?" : "Eliminar fragancia"}
+          aria-label={confirmDelete ? "Confirmar eliminación" : "Eliminar fragancia"}
         >
-          <Trash2 size={18} />
+          <Trash2 size={18} aria-hidden="true" />
         </button>
       </div>
 

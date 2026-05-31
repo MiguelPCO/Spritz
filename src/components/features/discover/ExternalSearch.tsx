@@ -42,7 +42,8 @@ export function ExternalSearch() {
       setSearching(true)
       try {
         const res = await fetch(`/api/fragrance-search?q=${encodeURIComponent(value)}`)
-        setResults(await res.json())
+        const data = await res.json()
+        setResults(Array.isArray(data) ? data : (data.results ?? []))
       } finally {
         setSearching(false)
       }
@@ -74,6 +75,7 @@ export function ExternalSearch() {
         <input
           value={query}
           onChange={(e) => handleChange(e.target.value)}
+          aria-label="Buscar por nombre, marca o familia"
           placeholder="Buscar por nombre, marca o familia..."
           className="flex-1 bg-transparent text-sm outline-none"
           style={{ color: "var(--text-primary)" }}

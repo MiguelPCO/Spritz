@@ -76,6 +76,8 @@ export function DailyFragranceCard() {
             <img
               src={imageUrl}
               alt={getFragranceName(pick)}
+              width={56}
+              height={56}
               className="h-full w-full object-cover"
               loading="lazy"
             />

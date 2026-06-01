@@ -28,6 +28,11 @@ Thumbs.db
 *.swp
 *.swo
 
+# AI tools
+.agents/
+.claude/
+.kiro/
+
 # Supabase
 .supabase/
 
@@ -35,3 +40,4 @@ Thumbs.db
 *.tsbuildinfo
 next-env.d.ts
 designsystemSpritz/
+.vercel

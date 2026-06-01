@@ -1,5 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
+import { ChevronRight } from "lucide-react"
 import type { UserFragrance } from "@/types/fragrance"
 import {
   getFragranceName,
@@ -41,6 +42,9 @@ export function FragranceCard({
       (Date.now() - new Date(lastWornAt).getTime()) / (1000 * 60 * 60 * 24) >= 14)
 
   if (variant === "full") {
+    const visibleFamilies = families.slice(0, 2)
+    const extraCount = families.length - visibleFamilies.length
+
     return (
       <Link href={`/wardrobe/${uf.id}`}>
         <div
@@ -48,7 +52,7 @@ export function FragranceCard({
           className="flex items-center gap-3 rounded-[16px] p-3 transition-shadow hover:shadow-md"
           style={{ backgroundColor: "var(--bg-card)" }}
         >
-          {/* Bottle avatar */}
+          {/* Thumbnail */}
           <div
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[12px]"
             style={{ backgroundColor: "var(--scent-accent-light)" }}
@@ -66,40 +70,49 @@ export function FragranceCard({
             )}
           </div>
 
-          {/* Info */}
+          {/* Info — name, brand, tags row */}
           <div className="flex-1 min-w-0">
-            <p
-              className="truncate text-sm font-semibold"
-              style={{ color: "var(--text-primary)" }}
-            >
+            <p className="truncate text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
               {name}
             </p>
-            <p className="truncate text-xs" style={{ color: "var(--text-secondary)" }}>
+            <p className="truncate text-xs mb-1.5" style={{ color: "var(--text-secondary)" }}>
               {brand}
             </p>
-            {uf.status !== "active" && STATUS_LABEL[uf.status] && (
-              <span className="text-[10px] font-medium" style={{ color: "var(--text-muted)" }}>
-                · {STATUS_LABEL[uf.status]}
-              </span>
-            )}
-            {isNeglected && (
-              <span className="text-[10px] font-medium" style={{ color: "var(--scent-accent)" }}>
-                · Sin usar 14+ días
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-1">
+              {visibleFamilies.map((fid) => {
+                const fd = getScentFamily(fid)
+                return (
+                  <span key={fid} className={`scent-tag scent-tag-${fd.id}`}>
+                    {fd.emoji} {fd.labelEs}
+                  </span>
+                )
+              })}
+              {extraCount > 0 && (
+                <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                  +{extraCount}
+                </span>
+              )}
+              {uf.status !== "active" && STATUS_LABEL[uf.status] && (
+                <span
+                  className="rounded-full px-2 py-0.5 text-[9px] font-medium"
+                  style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-muted)" }}
+                >
+                  {STATUS_LABEL[uf.status]}
+                </span>
+              )}
+              {isNeglected && (
+                <span
+                  className="rounded-full px-2 py-0.5 text-[9px] font-semibold"
+                  style={{ backgroundColor: "var(--scent-accent-light)", color: "var(--scent-accent)" }}
+                >
+                  💤 14d+
+                </span>
+              )}
+            </div>
           </div>
 
-          {/* Family tags */}
-          <div className="flex shrink-0 flex-col gap-1 items-end">
-            {families.map((fid) => {
-              const fd = getScentFamily(fid)
-              return (
-                <span key={fid} className={`scent-tag scent-tag-${fd.id}`}>
-                  {fd.emoji}
-                </span>
-              )
-            })}
-          </div>
+          {/* Chevron */}
+          <ChevronRight size={16} className="shrink-0" style={{ color: "var(--text-muted)" }} />
         </div>
       </Link>
     )

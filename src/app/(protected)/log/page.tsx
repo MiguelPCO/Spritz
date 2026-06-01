@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { TopBar } from "@/components/layout/TopBar"
 import { WearCalendar } from "@/components/features/log/WearCalendar"
 import { WearStats } from "@/components/features/log/WearStats"
@@ -42,9 +43,25 @@ export default function LogPage() {
             <p className="font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
               Sin registros este mes
             </p>
-            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
-              Usa una fragancia desde Hoy o desde el detalle para verla aquí
+            <p className="text-sm mb-5" style={{ color: "var(--text-secondary)" }}>
+              Registra un uso desde Hoy o desde el detalle de tu fragancia.
             </p>
+            <div className="flex gap-2">
+              <Link
+                href="/today"
+                className="rounded-[12px] px-4 py-2.5 text-sm font-medium text-white"
+                style={{ backgroundColor: "var(--scent-accent)" }}
+              >
+                Ir a Hoy
+              </Link>
+              <Link
+                href="/wardrobe"
+                className="rounded-[12px] px-4 py-2.5 text-sm font-medium"
+                style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-primary)" }}
+              >
+                Mi Colección
+              </Link>
+            </div>
           </div>
         ) : (
           <WearStats logs={logs} />

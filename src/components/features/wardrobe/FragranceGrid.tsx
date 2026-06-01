@@ -108,6 +108,20 @@ export function FragranceGrid({ fragrances, isLoading, lastWornDates }: Fragranc
           />
         </div>
       ))}
+
+      {/* CTA card when collection has a single item — fills the empty grid cell */}
+      {sorted.length === 1 && (
+        <Link
+          href="/add"
+          className="flex flex-col items-center justify-center gap-2 rounded-[16px] p-3 border-2 border-dashed transition-opacity hover:opacity-70"
+          style={{ borderColor: "var(--border-subtle)", minHeight: "180px" }}
+        >
+          <Plus size={24} style={{ color: "var(--text-muted)" }} />
+          <span className="text-xs text-center" style={{ color: "var(--text-muted)" }}>
+            Añade tu próxima fragancia
+          </span>
+        </Link>
+      )}
     </div>
   )
 }

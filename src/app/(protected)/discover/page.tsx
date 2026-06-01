@@ -1,6 +1,8 @@
 "use client"
 
 import { useMemo } from "react"
+import Link from "next/link"
+import { Plus } from "lucide-react"
 import { TopBar } from "@/components/layout/TopBar"
 import { useWardrobe } from "@/lib/hooks/useWardrobe"
 import { getFragranceFamily } from "@/types/fragrance"
@@ -39,6 +41,49 @@ export default function DiscoverPage() {
         <div className="mb-4">
           <DailyFragranceCard />
         </div>
+
+        {/* Progress card — shown when collection has < 3 active fragrances */}
+        {!isLoading && total < 3 && (
+          <div
+            className="rounded-[20px] p-5"
+            style={{ backgroundColor: "var(--bg-surface)" }}
+          >
+            <p className="text-xs font-medium uppercase tracking-widest mb-1" style={{ color: "var(--text-muted)" }}>
+              Perfil olfativo
+            </p>
+            <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
+              {total === 0
+                ? "Añade tus primeras fragancias"
+                : `Añade ${3 - total} fragancia${3 - total !== 1 ? "s" : ""} más`}
+            </p>
+            <p className="text-xs mb-4" style={{ color: "var(--text-muted)" }}>
+              Necesitas 3 fragancias activas para ver tu perfil olfativo.
+            </p>
+            <div className="mb-4">
+              <div className="flex justify-between text-xs mb-1.5" style={{ color: "var(--text-muted)" }}>
+                <span>{total} de 3 fragancias</span>
+                <span>{Math.round((total / 3) * 100)}%</span>
+              </div>
+              <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: "var(--border-subtle)" }}>
+                <div
+                  className="h-1.5 rounded-full transition-all"
+                  style={{
+                    width: `${Math.round((total / 3) * 100)}%`,
+                    backgroundColor: "var(--scent-accent)",
+                  }}
+                />
+              </div>
+            </div>
+            <Link
+              href="/add"
+              className="flex w-full items-center justify-center gap-2 rounded-[12px] py-2.5 text-sm font-medium text-white"
+              style={{ backgroundColor: "var(--scent-accent)" }}
+            >
+              <Plus size={15} />
+              Añadir fragancia
+            </Link>
+          </div>
+        )}
 
         {/* DNA profile */}
         {dominantDef && total >= 3 && (
@@ -115,17 +160,6 @@ export default function DiscoverPage() {
           )}
         </div>
 
-        {!isLoading && total < 3 && wishlist.length === 0 && (
-          <div className="py-16 text-center">
-            <p className="text-4xl mb-3">🔭</p>
-            <p className="text-sm font-semibold mb-1" style={{ color: "var(--text-primary)" }}>
-              Añade más fragancias
-            </p>
-            <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-              Necesitas al menos 3 para ver tu perfil olfativo.
-            </p>
-          </div>
-        )}
 
       </div>
     </div>

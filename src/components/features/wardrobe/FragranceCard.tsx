@@ -140,7 +140,7 @@ export function FragranceCard({
               className="absolute top-1.5 left-1.5 rounded-full px-2 py-0.5 text-[9px] font-semibold"
               style={{ backgroundColor: "var(--scent-accent)", color: "white" }}
             >
-              ¿La recuerdas?
+              💤 Sin usar 14d+
             </span>
           )}
 

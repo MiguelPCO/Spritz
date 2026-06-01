@@ -4,7 +4,7 @@ import { useState, useTransition, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
-import { Pencil, Check, X, LogOut, BookOpen, ChevronRight } from "lucide-react"
+import { Pencil, Check, X, LogOut, BookOpen, ChevronRight, KeyRound } from "lucide-react"
 import Link from "next/link"
 import { TopBar } from "@/components/layout/TopBar"
 import { Skeleton } from "@/components/ui/skeleton"
@@ -72,6 +72,17 @@ export default function ProfilePage() {
         })
       }
     })
+  }
+
+  async function handlePasswordReset() {
+    if (!profile?.email) return
+    const supabase = createClient()
+    const { error } = await supabase.auth.resetPasswordForEmail(profile.email)
+    if (error) {
+      toast.error("Error al enviar el email", { description: error.message })
+    } else {
+      toast.success("Email enviado", { description: "Revisa tu bandeja de entrada" })
+    }
   }
 
   async function handleLogout() {
@@ -214,15 +225,29 @@ export default function ProfilePage() {
           <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
         </Link>
 
-        {/* Logout */}
-        <button
-          onClick={handleLogout}
-          className="flex w-full items-center justify-center gap-2 rounded-[16px] py-3.5 text-sm font-medium transition-opacity hover:opacity-80"
-          style={{ backgroundColor: "var(--bg-surface)", color: "#C03A3A" }}
-        >
-          <LogOut size={16} />
-          Cerrar sesión
-        </button>
+        {/* Account actions */}
+        <div className="space-y-2">
+          <button
+            onClick={handlePasswordReset}
+            className="flex w-full items-center justify-between rounded-[16px] px-4 py-3.5 text-sm font-medium"
+            style={{ backgroundColor: "var(--bg-surface)", color: "var(--text-primary)" }}
+          >
+            <span className="flex items-center gap-2">
+              <KeyRound size={16} />
+              Cambiar contraseña
+            </span>
+            <ChevronRight size={14} style={{ color: "var(--text-muted)" }} />
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center justify-center gap-2 rounded-[16px] py-3.5 text-sm font-medium transition-opacity hover:opacity-80"
+            style={{ backgroundColor: "var(--bg-surface)", color: "#C03A3A" }}
+          >
+            <LogOut size={16} />
+            Cerrar sesión
+          </button>
+        </div>
 
       </div>
     </div>

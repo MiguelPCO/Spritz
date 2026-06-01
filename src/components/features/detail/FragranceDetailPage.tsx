@@ -74,7 +74,8 @@ export function FragranceDetailPage({ params }: Props) {
 
       <FragranceHeader userFragrance={uf} lastWornAt={lastWornAt ?? null} />
 
-      <div className="space-y-6 py-6">
+      {/* pb-14 ensures last item clears the sticky action bar */}
+      <div className="space-y-6 pt-6 pb-14">
         <NotesDisplay
           topNotes={topNotes}
           middleNotes={middleNotes}
@@ -109,9 +110,16 @@ export function FragranceDetailPage({ params }: Props) {
             ))}
           </div>
         )}
+      </div>
 
-        <hr style={{ borderColor: "var(--border-subtle)" }} className="mx-5" />
-
+      {/* Sticky action bar — always visible above bottom nav */}
+      <div
+        className="fixed bottom-16 inset-x-0 z-20 mx-auto max-w-[430px] px-5 py-3"
+        style={{
+          backgroundColor: "var(--bg-page)",
+          borderTop: "1px solid var(--border-subtle)",
+        }}
+      >
         <DetailActions userFragrance={uf} fragranceName={name} />
       </div>
     </div>

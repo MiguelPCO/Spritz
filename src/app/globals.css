@@ -369,3 +369,12 @@ h1, h2, h3, h4, h5, h6 {
 .safe-bottom {
   padding-bottom: env(safe-area-inset-bottom, 20px);
 }
+
+/* Utility missing from Tailwind v4 built-ins */
+.scrollbar-none {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}

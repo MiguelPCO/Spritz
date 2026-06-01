@@ -16,6 +16,7 @@ export function ExternalSearch() {
   const queryClient = useQueryClient()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<FragranceCatalogResult[]>([])
+  const [searchSource, setSearchSource] = useState<"seed" | "ai" | "empty">("seed")
   const [searching, setSearching] = useState(false)
   const [isPending, startTransition] = useTransition()
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -37,13 +38,14 @@ export function ExternalSearch() {
   function handleChange(value: string) {
     setQuery(value)
     if (debounceRef.current) clearTimeout(debounceRef.current)
-    if (!value.trim()) { setResults([]); return }
+    if (!value.trim()) { setResults([]); setSearchSource("seed"); return }
     debounceRef.current = setTimeout(async () => {
       setSearching(true)
       try {
         const res = await fetch(`/api/fragrance-search?q=${encodeURIComponent(value)}`)
         const data = await res.json()
         setResults(Array.isArray(data) ? data : (data.results ?? []))
+        setSearchSource(data.source ?? "seed")
       } finally {
         setSearching(false)
       }
@@ -93,6 +95,19 @@ export function ExternalSearch() {
 
       {results.length > 0 && (
         <div className="space-y-2">
+          {searchSource === "ai" && (
+            <div className="flex items-center gap-2 px-1">
+              <span
+                className="rounded-full px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-widest"
+                style={{ backgroundColor: "var(--scent-accent-light)", color: "var(--scent-accent)" }}
+              >
+                ✦ Sugerencias de IA
+              </span>
+              <span className="text-[10px]" style={{ color: "var(--text-muted)" }}>
+                No hay resultados exactos en el catálogo
+              </span>
+            </div>
+          )}
           {results.map((r) => (
             <CatalogFragranceCard
               key={r.id}

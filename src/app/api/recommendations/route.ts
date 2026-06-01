@@ -7,7 +7,7 @@ import type { AIPromptContext, AIRecommendationResponse } from "@/types/recommen
 function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
   if (ctx.wardrobe.length === 0) return null
 
-  const { temp } = ctx.weather
+  const temp = ctx.weather?.temp ?? 15
   const timeOfDay = ctx.timeOfDay
 
   // Score each fragrance by simple heuristics
@@ -85,9 +85,9 @@ export async function POST(request: Request) {
     )
   }
 
-  if (!body.weather || !body.timeOfDay) {
+  if (!body.timeOfDay) {
     return NextResponse.json(
-      { error: "Se requieren datos de tiempo y momento del día" },
+      { error: "Se requiere el momento del día" },
       { status: 400 }
     )
   }

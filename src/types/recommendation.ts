@@ -3,7 +3,7 @@ import type { UserFragrance } from "./fragrance"
 
 /** Input context sent to the AI recommendation engine */
 export interface AIPromptContext {
-  weather: WeatherData
+  weather?: WeatherData
   timeOfDay: TimeOfDay
   occasions: string[]
   moods: string[]

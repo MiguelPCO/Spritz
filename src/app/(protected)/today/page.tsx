@@ -30,7 +30,7 @@ export default function TodayPage() {
   const [hasRequested, setHasRequested] = useState(false)
   const { occasions, moods, freeText, toggleOccasion, toggleMood, setFreeText, reset } = useRecommendationStore()
 
-  const { lat, lon } = useGeolocation()
+  const { lat, lon, error: geoError, loading: geoLoading } = useGeolocation()
   const { data: weather } = useWeather(lat, lon)
   const { data: wardrobe = [], isLoading: wardrobeLoading } = useWardrobe()
   const { data: recentWearLogs = [] } = useRecentWears()
@@ -57,7 +57,7 @@ export default function TodayPage() {
   }, [recentWearLogs, wardrobe])
 
   const aiContext = useMemo(() => {
-    if (wardrobe.length === 0 || !weather) return null
+    if (wardrobe.length === 0) return null
     return {
       weather,
       timeOfDay: getTimeOfDay(),
@@ -264,19 +264,27 @@ export default function TodayPage() {
             <div className="px-5">
               <button
                 onClick={handleDiscover}
-                disabled={wardrobeLoading || !weather}
+                disabled={wardrobeLoading || geoLoading}
                 className="flex w-full h-[52px] items-center justify-center gap-2 rounded-[16px] text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                 style={{ backgroundColor: "var(--scent-accent)" }}
               >
                 <Sparkles size={16} />
                 Descubrir mi fragancia del día
               </button>
-              {!weather && !wardrobeLoading && (
+              {geoLoading && (
                 <p
                   className="mt-2 text-center text-xs"
                   style={{ color: "var(--text-muted)" }}
                 >
                   Obteniendo tu ubicación…
+                </p>
+              )}
+              {geoError && !weather && (
+                <p
+                  className="mt-2 text-center text-xs"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  Sin datos de tiempo — la IA usará otros factores
                 </p>
               )}
             </div>

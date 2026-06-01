@@ -75,7 +75,7 @@ export default function RootLayout({
         <QueryProvider>
           {children}
         </QueryProvider>
-        <Toaster position="bottom-center" richColors />
+        <Toaster position="top-center" richColors />
       </body>
     </html>
   )

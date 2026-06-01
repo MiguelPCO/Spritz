@@ -50,7 +50,7 @@ function buildPrompt(ctx: AIPromptContext): string {
   return `Selecciona UNA fragancia del armario del usuario para estas condiciones:
 
 CONTEXTO:
-- Tiempo: ${ctx.weather.temp}°C, ${ctx.weather.description}, humedad ${ctx.weather.humidity}%
+- Tiempo: ${ctx.weather ? `${ctx.weather.temp}°C, ${ctx.weather.description}, humedad ${ctx.weather.humidity}%` : "Sin datos meteorológicos disponibles"}
 - Momento del día: ${timeLabel}
 - Ocasión: ${ctx.occasions.length > 0 ? ctx.occasions.join(", ") : "Sin especificar"}
 - Estado de ánimo: ${ctx.moods.length > 0 ? ctx.moods.join(", ") : "Sin especificar"}${ctx.freeText ? `\n- Contexto adicional: ${sanitizeUserText(ctx.freeText)}` : ""}

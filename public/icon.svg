@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#E85D3A"/>
+  <!-- Bottle body -->
+  <rect x="168" y="200" width="176" height="216" rx="28" fill="white"/>
+  <!-- Bottle neck -->
+  <rect x="224" y="148" width="64" height="56" rx="8" fill="white"/>
+  <!-- Bottle cap -->
+  <rect x="212" y="124" width="88" height="32" rx="10" fill="rgba(255,255,255,0.75)"/>
+  <!-- Nozzle -->
+  <rect x="288" y="108" width="24" height="46" rx="8" fill="white"/>
+  <!-- Spray dots -->
+  <circle cx="334" cy="110" r="7" fill="white" opacity="0.8"/>
+  <circle cx="352" cy="128" r="5" fill="white" opacity="0.55"/>
+  <circle cx="346" cy="96" r="4" fill="white" opacity="0.4"/>
+  <circle cx="366" cy="112" r="3" fill="white" opacity="0.3"/>
+  <!-- Label stripe on bottle -->
+  <rect x="168" y="272" width="176" height="48" rx="0" fill="rgba(232,93,58,0.18)"/>
+</svg>

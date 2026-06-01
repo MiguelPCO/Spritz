@@ -7,10 +7,12 @@ import type { AIPromptContext, AIRecommendationResponse } from "@/types/recommen
 async function fetchRecommendation(
   ctx: AIPromptContext
 ): Promise<AIRecommendationResponse> {
+  // wardrobe is fetched server-side — omit it from the request body
+  const { wardrobe: _wardrobe, ...payload } = ctx
   const res = await fetch("/api/recommendations", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(ctx),
+    body: JSON.stringify(payload),
   })
 
   if (!res.ok) {

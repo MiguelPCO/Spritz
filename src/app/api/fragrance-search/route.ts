@@ -23,16 +23,18 @@ async function aiFragranceLookup(query: string): Promise<FragranceCatalogResult[
       model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
       system: `Eres una base de datos experta en fragancias y perfumes.
-Dado un texto de búsqueda, devuelve un array JSON de hasta 8 fragancias reales que coincidan.
+Dado un texto de búsqueda, devuelve un array JSON de hasta 8 fragancias reales que coincidan DIRECTAMENTE con la consulta (misma marca, nombre o ingrediente principal).
+NO incluyas fragancias de marcas o nombres distintos aunque sean del mismo estilo olfativo.
+Si la consulta es un nombre de marca, devuelve SOLO fragancias de esa marca exacta.
 Responde SOLO con JSON válido sin markdown.
 Familias olfativas válidas: fresh, floral, oriental, woody, green, amber, citrica, fougere, chipre, gourmand, aromatica, acuatica, afrutada, cuero.
 Formato exacto de cada objeto:
 {"id":"ai-1","name":"Nombre","brand":"Marca","family":"familia","topNotes":["nota1","nota2"],"middleNotes":["nota1"],"baseNotes":["nota1"],"imageUrl":null,"description":"Descripción breve en español.","gender":"masculine|feminine|unisex","year":2010}
-Si no hay ninguna fragancia real que coincida, devuelve [].`,
+Si no hay ninguna fragancia real que coincida directamente, devuelve [].`,
       messages: [
         {
           role: "user",
-          content: `Busca fragancias que coincidan con: "${query}"`,
+          content: `Busca fragancias que coincidan DIRECTAMENTE con: "${query}"`,
         },
       ],
     })

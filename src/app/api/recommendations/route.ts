@@ -1,7 +1,24 @@
 import { NextResponse } from "next/server"
 import { generateRecommendation } from "@/lib/api/ai"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { getFragranceFamilies } from "@/types/fragrance"
+import { getTimeOfDay } from "@/types/weather"
 import type { AIPromptContext, AIRecommendationResponse } from "@/types/recommendation"
+import type { WeatherData } from "@/types/weather"
+import type { UserFragrance } from "@/types/fragrance"
+
+/** Fields accepted from the client — wardrobe is always fetched server-side */
+interface ClientPayload {
+  weather?: WeatherData
+  occasions?: string[]
+  moods?: string[]
+  freeText?: string
+  recentWears?: Array<{ fragranceName: string; brand: string; wornAt: string }>
+}
+
+function sanitizeText(text: string, maxLen = 100): string {
+  return text.replace(/[\n\r|{}"]/g, " ").trim().slice(0, maxLen)
+}
 
 /** Simple rule-based fallback when AI is unavailable */
 function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
@@ -10,26 +27,20 @@ function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
   const temp = ctx.weather?.temp ?? 15
   const timeOfDay = ctx.timeOfDay
 
-  // Score each fragrance by simple heuristics
   const scored = ctx.wardrobe.map((f) => {
     let score = 0
     const fams = f.families ?? [f.family]
 
     const hasFamily = (...ids: string[]) => ids.some((id) => fams.includes(id))
 
-    // Temperature preference
     if (temp < 10 && hasFamily("oriental", "woody", "amber", "gourmand", "cuero")) score += 3
     if (temp >= 10 && temp < 20 && hasFamily("woody", "floral", "fougere", "chipre", "aromatica")) score += 2
     if (temp >= 20 && hasFamily("fresh", "green", "citrica", "acuatica", "afrutada")) score += 3
 
-    // Time of day
     if (timeOfDay === "morning" && hasFamily("fresh", "green", "citrica", "acuatica")) score += 2
     if (timeOfDay === "evening" && hasFamily("oriental", "woody", "amber", "gourmand", "cuero")) score += 2
 
-    // Occasion match (any selected occasion)
     if (ctx.occasions.length > 0 && ctx.occasions.some((o) => f.occasionTags.includes(o))) score += 3
-
-    // Mood match
     if (ctx.moods.length > 0 && ctx.moods.some((m) => f.moodTags.includes(m))) score += 3
 
     return { f, score }
@@ -62,8 +73,24 @@ function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
   }
 }
 
+function buildWardrobeEntry(uf: UserFragrance): AIPromptContext["wardrobe"][number] {
+  const families = getFragranceFamilies(uf)
+  // Sanitize custom fields before they reach the AI prompt (#9)
+  const name = uf.fragrance?.name ?? sanitizeText(uf.custom_name ?? "", 80)
+  const brand = uf.fragrance?.brand ?? sanitizeText(uf.custom_brand ?? "", 80)
+  return {
+    id: uf.id,
+    name,
+    brand,
+    family: families[0],
+    families,
+    occasionTags: uf.occasion_tags,
+    moodTags: uf.mood_tags,
+    topNotes: uf.fragrance?.top_notes ?? [],
+  }
+}
+
 export async function POST(request: Request) {
-  // Verify auth
   const supabase = await createSupabaseServerClient()
   const { data: { session } } = await supabase.auth.getSession()
 
@@ -71,35 +98,43 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
-  let body: Partial<AIPromptContext>
+  let body: ClientPayload
   try {
     body = await request.json()
   } catch {
     return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 })
   }
 
-  if (!body.wardrobe || body.wardrobe.length === 0) {
+  // Fetch wardrobe server-side — never trust client-provided fragrance data
+  const { data: wardrobeRows, error: wardrobeError } = await supabase
+    .from("user_fragrances")
+    .select("*, fragrance:fragrances (*)")
+    .eq("user_id", session.user.id)
+    .eq("status", "active")
+
+  if (wardrobeError) {
+    return NextResponse.json({ error: "Error al obtener el armario" }, { status: 500 })
+  }
+
+  const wardrobe = (wardrobeRows ?? [] as unknown[]).map((row) =>
+    buildWardrobeEntry(row as unknown as UserFragrance)
+  )
+
+  if (wardrobe.length === 0) {
     return NextResponse.json(
       { error: "El armario está vacío. Añade fragancias primero." },
       { status: 400 }
     )
   }
 
-  if (!body.timeOfDay) {
-    return NextResponse.json(
-      { error: "Se requiere el momento del día" },
-      { status: 400 }
-    )
-  }
-
   const ctx: AIPromptContext = {
     weather: body.weather,
-    timeOfDay: body.timeOfDay,
-    occasions: body.occasions ?? [],
-    moods: body.moods ?? [],
-    freeText: body.freeText,
-    recentWears: body.recentWears ?? [],
-    wardrobe: body.wardrobe,
+    timeOfDay: getTimeOfDay(),
+    occasions: Array.isArray(body.occasions) ? body.occasions.map(String).slice(0, 10) : [],
+    moods: Array.isArray(body.moods) ? body.moods.map(String).slice(0, 10) : [],
+    freeText: body.freeText ? sanitizeText(body.freeText, 300) : undefined,
+    recentWears: Array.isArray(body.recentWears) ? body.recentWears.slice(0, 20) : [],
+    wardrobe,
   }
 
   try {
@@ -108,8 +143,6 @@ export async function POST(request: Request) {
   } catch (err) {
     console.error("[/api/recommendations] Error:", err)
 
-    // If AI fails (billing, network, etc.) return a rule-based fallback
-    // so the app stays functional
     const fallback = ruleBasedPick(ctx)
     if (fallback) {
       return NextResponse.json(fallback)

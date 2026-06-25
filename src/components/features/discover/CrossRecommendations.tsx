@@ -44,8 +44,8 @@ export function CrossRecommendations() {
     setLoading(true)
     fetch(`/api/fragrance-search?q=${encodeURIComponent(dominantFamily)}`)
       .then((r) => r.json())
-      .then((data: FragranceCatalogResult[]) => {
-        const filtered = data.filter((r) => {
+      .then((data: { results: FragranceCatalogResult[] }) => {
+        const filtered = (data.results ?? []).filter((r) => {
           if (ownedKeys.has(r.id)) return false
           return !ownedKeys.has(`${r.name.toLowerCase()}|${r.brand.toLowerCase()}`)
         })

@@ -127,7 +127,9 @@ export default function TodayPage() {
 
   return (
     <div style={{ backgroundColor: "var(--bg-page)" }}>
-      <TopBar showLogo />
+      <div className="md:hidden">
+        <TopBar showLogo />
+      </div>
 
       {weather && (
         <div className="px-5 pb-4">

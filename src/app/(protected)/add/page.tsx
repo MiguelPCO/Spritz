@@ -40,26 +40,28 @@ export default function AddFragrancePage() {
         }
       />
 
-      {/* Progress indicator */}
-      <div className="flex gap-1 px-5 pb-4">
-        {[1, 2, 3].map((n) => (
-          <div
-            key={n}
-            className="h-1 flex-1 rounded-full transition-colors"
-            style={{
-              backgroundColor:
-                n <= STEP_PROGRESS[step]
-                  ? "var(--scent-accent)"
-                  : "var(--bg-surface)",
-            }}
-          />
-        ))}
-      </div>
+      <div className="md:max-w-lg md:mx-auto">
+        {/* Progress indicator */}
+        <div className="flex gap-1 px-5 pb-4">
+          {[1, 2, 3].map((n) => (
+            <div
+              key={n}
+              className="h-1 flex-1 rounded-full transition-colors"
+              style={{
+                backgroundColor:
+                  n <= STEP_PROGRESS[step]
+                    ? "var(--scent-accent)"
+                    : "var(--bg-surface)",
+              }}
+            />
+          ))}
+        </div>
 
-      <div className="px-5 py-2 md:max-w-lg md:mx-auto md:pt-10">
-        {step === "search" && <SearchStep />}
-        {step === "manual" && <ManualEntryForm />}
-        {step === "tags" && <TagsStep />}
+        <div className="px-5 py-2 md:pt-10">
+          {step === "search" && <SearchStep />}
+          {step === "manual" && <ManualEntryForm />}
+          {step === "tags" && <TagsStep />}
+        </div>
       </div>
     </div>
   )

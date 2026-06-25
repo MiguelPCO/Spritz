@@ -71,8 +71,8 @@ export function FrequentFragrances({ fragrances }: FrequentFragrancesProps) {
                   <Image
                     src={imageUrl}
                     alt={getFragranceName(uf)}
-                    width={56}
-                    height={56}
+                    width={112}
+                    height={112}
                     className="h-full w-full object-cover"
                   />
                 ) : (

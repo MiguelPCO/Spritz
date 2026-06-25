@@ -135,9 +135,9 @@ export function FragranceCard({
             <Image
               src={imageUrl}
               alt={name}
-              width={112}
-              height={112}
-              className="h-full w-full rounded-[12px] object-cover"
+              fill
+              className="rounded-[12px] object-cover"
+              sizes="(min-width: 1280px) 20vw, (min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
             />
           ) : (
             <span

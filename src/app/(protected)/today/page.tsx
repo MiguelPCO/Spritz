@@ -137,7 +137,7 @@ export default function TodayPage() {
         </div>
       )}
 
-      <div className="space-y-5 pb-8">
+      <div className="space-y-5 pb-8 md:max-w-2xl md:mx-auto">
 
         {/* Empty wardrobe */}
         {!wardrobeLoading && wardrobe.length === 0 && (

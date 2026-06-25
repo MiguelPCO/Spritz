@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav
-      className="safe-bottom fixed bottom-0 left-1/2 flex w-full max-w-[430px] -translate-x-1/2 items-end justify-around border-t px-2"
+      className="safe-bottom fixed bottom-0 left-1/2 flex md:hidden w-full max-w-[430px] -translate-x-1/2 items-end justify-around border-t px-2"
       style={{
         backgroundColor: "var(--bg-card)",
         borderColor: "var(--border-subtle)",

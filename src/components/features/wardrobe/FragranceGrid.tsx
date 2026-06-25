@@ -37,7 +37,7 @@ export function FragranceGrid({ fragrances, isLoading, lastWornDates }: Fragranc
 
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 px-5">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-5">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-[180px] rounded-[16px]" />
         ))}
@@ -94,7 +94,7 @@ export function FragranceGrid({ fragrances, isLoading, lastWornDates }: Fragranc
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 px-5">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 px-5">
       {sorted.map((uf, index) => (
         <div
           key={uf.id}

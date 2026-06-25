@@ -52,10 +52,10 @@ export function WardrobeFilters() {
       <div className="relative">
         {/* Right fade — hints at hidden chips */}
         <div
-          className="pointer-events-none absolute right-0 top-0 z-10 h-full w-10"
+          className="pointer-events-none absolute right-0 top-0 z-10 h-full w-10 md:hidden"
           style={{ background: "linear-gradient(to left, var(--bg-page), transparent)" }}
         />
-        <div className="flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none pr-8">
+        <div className="flex gap-2 overflow-x-auto px-5 pb-1 scrollbar-none pr-8 md:flex-wrap md:overflow-visible md:pr-5">
         {/* All */}
         <button
           onClick={() => setActiveFilter(null)}

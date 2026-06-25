@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useTransition, useMemo } from "react"
 import { toast } from "sonner"
+import { Search } from "lucide-react"
 import { useWardrobe } from "@/lib/hooks/useWardrobe"
 import { useQueryClient } from "@tanstack/react-query"
 import { getFragranceFamily, getFragranceName, getFragranceBrand } from "@/types/fragrance"
@@ -18,6 +19,8 @@ export function CrossRecommendations() {
   const [results, setResults] = useState<FragranceCatalogResult[]>([])
   const [loading, setLoading] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const [inputValue, setInputValue] = useState("")
+  const [activeQuery, setActiveQuery] = useState<string | null>(null)
 
   const actives = wardrobe.filter((uf) => uf.status === "active")
 
@@ -39,10 +42,12 @@ export function CrossRecommendations() {
     })
   ), [wardrobe])
 
+  const queryToFetch = activeQuery ?? dominantFamily
+
   useEffect(() => {
-    if (!dominantFamily || actives.length < 3) return
+    if (!queryToFetch) return
     setLoading(true)
-    fetch(`/api/fragrance-search?q=${encodeURIComponent(dominantFamily)}`)
+    fetch(`/api/fragrance-search?q=${encodeURIComponent(queryToFetch)}`)
       .then((r) => r.json())
       .then((data: { results: FragranceCatalogResult[] }) => {
         const filtered = (data.results ?? []).filter((r) => {
@@ -53,11 +58,14 @@ export function CrossRecommendations() {
       })
       .finally(() => setLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dominantFamily])
+  }, [queryToFetch])
 
-  if (!dominantFamily || actives.length < 3) return null
-
-  const familyDef = getScentFamily(dominantFamily)
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    const trimmed = inputValue.trim()
+    setActiveQuery(trimmed || null)
+    setResults([])
+  }
 
   function handleAdd(result: FragranceCatalogResult) {
     startTransition(async () => {
@@ -72,23 +80,49 @@ export function CrossRecommendations() {
     })
   }
 
-  if (loading) {
-    return (
-      <div className="space-y-2">
-        <Skeleton className="h-4 w-40" />
-        {[0, 1, 2].map((i) => <Skeleton key={i} className="h-14 w-full rounded-[12px]" />)}
-      </div>
-    )
-  }
-
-  if (results.length === 0) return null
+  const familyDef = dominantFamily ? getScentFamily(dominantFamily) : null
+  const label = activeQuery
+    ? `Resultados · "${activeQuery}"`
+    : familyDef
+    ? `Te podría gustar · ${familyDef.emoji} ${familyDef.labelEs}`
+    : null
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
-        Te podría gustar · {familyDef.emoji} {familyDef.labelEs}
-      </p>
-      {results.map((r) => (
+      <form onSubmit={handleSearch} className="relative">
+        <Search
+          size={15}
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none"
+          style={{ color: "var(--text-muted)" }}
+        />
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Recomienda un perfume amaderado…"
+          className="h-10 w-full rounded-[12px] border pl-9 pr-4 text-sm outline-none transition-colors"
+          style={{
+            backgroundColor: "var(--bg-surface)",
+            borderColor: "var(--border-subtle)",
+            color: "var(--text-primary)",
+          }}
+        />
+      </form>
+
+      {loading && (
+        <div className="space-y-2">
+          <Skeleton className="h-4 w-40" />
+          {[0, 1, 2].map((i) => <Skeleton key={i} className="h-14 w-full rounded-[12px]" />)}
+        </div>
+      )}
+
+      {!loading && label && results.length > 0 && (
+        <p className="text-xs font-medium uppercase tracking-widest" style={{ color: "var(--text-muted)" }}>
+          {label}
+        </p>
+      )}
+
+      {!loading && results.map((r) => (
         <CatalogFragranceCard
           key={r.id}
           result={r}
@@ -96,6 +130,12 @@ export function CrossRecommendations() {
           isAdding={isPending}
         />
       ))}
+
+      {!loading && results.length === 0 && queryToFetch && (
+        <p className="text-xs text-center py-3" style={{ color: "var(--text-muted)" }}>
+          Sin resultados para esta búsqueda
+        </p>
+      )}
     </div>
   )
 }

@@ -25,6 +25,7 @@ export function SearchStep() {
     setSearching(true)
     try {
       const res = await fetch(`/api/fragrance-search?q=${encodeURIComponent(trimmed)}`)
+      if (!res.ok) throw new Error(`HTTP ${res.status}`)
       const data = (await res.json()) as { results: FragranceCatalogResult[]; source: SearchSource }
       setResults(data.results ?? [])
       setSource(data.source ?? "empty")

@@ -13,22 +13,22 @@ export async function logWear(params: {
 }) {
   const supabase = await createSupabaseServerClient()
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  if (!session) throw new Error("No autenticado")
+  if (!user) throw new Error("No autenticado")
 
   // Verify fragrance belongs to this user before logging
   const { data: owned } = await supabase
     .from("user_fragrances")
     .select("id")
     .eq("id", params.userFragranceId)
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
     .maybeSingle()
   if (!owned) throw new Error("Fragancia no encontrada")
 
   const { error } = await supabase.from("wear_logs").insert({
-    user_id: session.user.id,
+    user_id: user.id,
     user_fragrance_id: params.userFragranceId,
     occasion: params.occasion,
     mood: params.mood,

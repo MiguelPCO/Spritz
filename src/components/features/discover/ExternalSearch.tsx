@@ -43,9 +43,12 @@ export function ExternalSearch() {
       setSearching(true)
       try {
         const res = await fetch(`/api/fragrance-search?q=${encodeURIComponent(value)}`)
+        if (!res.ok) throw new Error(`HTTP ${res.status}`)
         const data = await res.json()
         setResults(Array.isArray(data) ? data : (data.results ?? []))
         setSearchSource(data.source ?? "seed")
+      } catch {
+        setResults([])
       } finally {
         setSearching(false)
       }

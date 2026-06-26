@@ -21,6 +21,7 @@ export function useWeather(lat: number | null, lon: number | null) {
     queryFn: () => fetchWeather(lat!, lon!),
     enabled: lat !== null && lon !== null,
     staleTime: 30 * 60 * 1000, // 30 minutes
-    retry: 2,
+    retry: (failureCount, error) =>
+      error instanceof Error && error.message === "Unauthorized" ? false : failureCount < 2,
   })
 }

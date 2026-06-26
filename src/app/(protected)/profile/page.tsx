@@ -89,7 +89,7 @@ export default function ProfilePage() {
     const supabase = createClient()
     await supabase.auth.signOut()
     queryClient.clear()
-    router.push("/auth/login")
+    router.push("/login")
   }
 
   const displayName = profile?.display_name || profile?.email?.split("@")[0] || "Usuario"

@@ -9,7 +9,7 @@ const anthropicClient = process.env.ANTHROPIC_API_KEY
   ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
   : null
 
-function sanitizeUserText(text: string, maxLen = 300): string {
+export function sanitizeUserText(text: string, maxLen = 300): string {
   return text
     .replace(/[\n\r]/g, " ")
     .replace(/[|{}"]/g, "")

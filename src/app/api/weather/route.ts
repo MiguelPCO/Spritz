@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server"
 import { fetchWeatherByCoords } from "@/lib/api/openweather"
+import { createSupabaseServerClient } from "@/lib/supabase/server"
 
 export async function GET(request: Request) {
+  const supabase = await createSupabaseServerClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
   const { searchParams } = new URL(request.url)
   const lat = parseFloat(searchParams.get("lat") ?? "")
   const lon = parseFloat(searchParams.get("lon") ?? "")
@@ -24,7 +29,7 @@ export async function GET(request: Request) {
     const weather = await fetchWeatherByCoords(lat, lon)
     return NextResponse.json(weather, {
       headers: {
-        "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+        "Cache-Control": "private, max-age=1800, stale-while-revalidate=3600",
       },
     })
   } catch (err) {

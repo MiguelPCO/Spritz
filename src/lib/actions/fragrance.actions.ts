@@ -24,8 +24,8 @@ interface AddToWardrobeParams {
 
 export async function addToWardrobe(params: AddToWardrobeParams) {
   const supabase = await createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error("No autenticado")
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autenticado")
 
   let fragranceId: string | null = null
 
@@ -75,7 +75,7 @@ export async function addToWardrobe(params: AddToWardrobeParams) {
 
   // Insert user_fragrance
   const { error } = await supabase.from("user_fragrances").insert({
-    user_id: session.user.id,
+    user_id: user.id,
     fragrance_id: fragranceId,
     custom_name: params.customName ?? null,
     custom_brand: params.customBrand ?? null,
@@ -124,8 +124,8 @@ export async function updateFragrance(
   }
 ) {
   const supabase = await createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error("No autenticado")
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autenticado")
 
   const { error } = await supabase
     .from("user_fragrances")
@@ -145,7 +145,7 @@ export async function updateFragrance(
       ...(updates.customNotes !== undefined && { custom_notes: updates.customNotes }),
     })
     .eq("id", id)
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   if (error) throw new Error(error.message)
   revalidatePath("/wardrobe")
@@ -155,33 +155,32 @@ export async function updateWishlistPositions(
   positions: Array<{ id: string; position: number }>
 ) {
   const supabase = await createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error("No autenticado")
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autenticado")
 
-  const results = await Promise.all(
-    positions.map(({ id, position }) =>
-      supabase
-        .from("user_fragrances")
-        .update({ wishlist_position: position })
-        .eq("id", id)
-        .eq("user_id", session.user.id)
+  const { error } = await supabase
+    .from("user_fragrances")
+    .upsert(
+      positions.map(({ id, position }) => ({
+        id,
+        wishlist_position: position,
+        user_id: user.id,
+      }))
     )
-  )
-  const failed = results.filter((r) => r.error)
-  if (failed.length > 0) throw new Error(failed[0].error!.message)
+  if (error) throw new Error(error.message)
   revalidatePath("/discover")
 }
 
 export async function deleteFragrance(id: string) {
   const supabase = await createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) throw new Error("No autenticado")
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error("No autenticado")
 
   const { error } = await supabase
     .from("user_fragrances")
     .delete()
     .eq("id", id)
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
 
   if (error) throw new Error(error.message)
   revalidatePath("/wardrobe")

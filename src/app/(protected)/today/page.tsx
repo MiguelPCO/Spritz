@@ -131,13 +131,12 @@ export default function TodayPage() {
         <TopBar showLogo />
       </div>
 
-      {weather && (
-        <div className="px-5 pb-4">
-          <WeatherBadge weather={weather} />
-        </div>
-      )}
-
       <div className="space-y-5 pb-8 md:max-w-2xl md:mx-auto">
+        {weather && (
+          <div className="px-5">
+            <WeatherBadge weather={weather} />
+          </div>
+        )}
 
         {/* Empty wardrobe */}
         {!wardrobeLoading && wardrobe.length === 0 && (
@@ -300,6 +299,17 @@ export default function TodayPage() {
               <div className="space-y-3 mx-5">
                 <Skeleton className="h-[200px] w-full rounded-[20px]" />
                 <Skeleton className="h-12 w-full rounded-[12px]" />
+              </div>
+            )}
+
+            {!recLoading && !recommendedFragrance && (
+              <div
+                className="mx-5 rounded-[16px] p-5 text-center"
+                style={{ backgroundColor: "var(--bg-surface)" }}
+              >
+                <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+                  No se pudo obtener una recomendación. Inténtalo de nuevo.
+                </p>
               </div>
             )}
 

@@ -3,23 +3,24 @@ import { searchFragrances } from "@/lib/api/parfumo"
 import type { FragranceCatalogResult } from "@/lib/api/parfumo"
 import Anthropic from "@anthropic-ai/sdk"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
+import { SCENT_FAMILIES } from "@/lib/constants/scentFamilies"
 
-const VALID_FAMILIES = new Set([
-  "fresh", "floral", "oriental", "woody", "green", "amber",
-  "citrica", "fougere", "chipre", "gourmand", "aromatica", "acuatica", "afrutada", "cuero",
-])
+const VALID_FAMILIES = new Set<string>(SCENT_FAMILIES.map((f) => f.id))
+
+// Singleton — avoids creating a new HTTP agent per request
+const anthropicClient = process.env.ANTHROPIC_API_KEY
+  ? new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  : null
 
 function sanitizeFamily(f: unknown): string {
   return typeof f === "string" && VALID_FAMILIES.has(f) ? f : "woody"
 }
 
 async function aiFragranceLookup(query: string): Promise<FragranceCatalogResult[]> {
-  const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) return []
+  if (!anthropicClient) return []
 
   try {
-    const client = new Anthropic({ apiKey })
-    const message = await client.messages.create({
+    const message = await anthropicClient.messages.create({
       model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
       system: `Eres una base de datos experta en fragancias y perfumes.
@@ -72,8 +73,8 @@ Si no hay ninguna fragancia real que coincida directamente, devuelve [].`,
 
 export async function GET(request: NextRequest) {
   const supabase = await createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const q = request.nextUrl.searchParams.get("q") ?? ""
   if (!q.trim()) return NextResponse.json({ results: [], source: "seed" })

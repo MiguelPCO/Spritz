@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { generateRecommendation } from "@/lib/api/ai"
+import { generateRecommendation, sanitizeUserText } from "@/lib/api/ai"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
 import { getFragranceFamilies } from "@/types/fragrance"
 import { getTimeOfDay } from "@/types/weather"
@@ -14,10 +14,6 @@ interface ClientPayload {
   moods?: string[]
   freeText?: string
   recentWears?: Array<{ fragranceName: string; brand: string; wornAt: string }>
-}
-
-function sanitizeText(text: string, maxLen = 100): string {
-  return text.replace(/[\n\r|{}"]/g, " ").trim().slice(0, maxLen)
 }
 
 /** Simple rule-based fallback when AI is unavailable */
@@ -76,8 +72,8 @@ function ruleBasedPick(ctx: AIPromptContext): AIRecommendationResponse | null {
 function buildWardrobeEntry(uf: UserFragrance): AIPromptContext["wardrobe"][number] {
   const families = getFragranceFamilies(uf)
   // Sanitize custom fields before they reach the AI prompt (#9)
-  const name = uf.fragrance?.name ?? sanitizeText(uf.custom_name ?? "", 80)
-  const brand = uf.fragrance?.brand ?? sanitizeText(uf.custom_brand ?? "", 80)
+  const name = uf.fragrance?.name ?? sanitizeUserText(uf.custom_name ?? "", 80)
+  const brand = uf.fragrance?.brand ?? sanitizeUserText(uf.custom_brand ?? "", 80)
   return {
     id: uf.id,
     name,
@@ -92,9 +88,9 @@ function buildWardrobeEntry(uf: UserFragrance): AIPromptContext["wardrobe"][numb
 
 export async function POST(request: Request) {
   const supabase = await createSupabaseServerClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  if (!session) {
+  if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
@@ -109,7 +105,7 @@ export async function POST(request: Request) {
   const { data: wardrobeRows, error: wardrobeError } = await supabase
     .from("user_fragrances")
     .select("*, fragrance:fragrances (*)")
-    .eq("user_id", session.user.id)
+    .eq("user_id", user.id)
     .eq("status", "active")
 
   if (wardrobeError) {
@@ -132,7 +128,7 @@ export async function POST(request: Request) {
     timeOfDay: getTimeOfDay(),
     occasions: Array.isArray(body.occasions) ? body.occasions.map(String).slice(0, 10) : [],
     moods: Array.isArray(body.moods) ? body.moods.map(String).slice(0, 10) : [],
-    freeText: body.freeText ? sanitizeText(body.freeText, 300) : undefined,
+    freeText: body.freeText ? sanitizeUserText(body.freeText, 300) : undefined,
     recentWears: Array.isArray(body.recentWears) ? body.recentWears.slice(0, 20) : [],
     wardrobe,
   }

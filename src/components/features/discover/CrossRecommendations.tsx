@@ -48,7 +48,10 @@ export function CrossRecommendations() {
     if (!queryToFetch) return
     setLoading(true)
     fetch(`/api/fragrance-search?q=${encodeURIComponent(queryToFetch)}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`)
+        return r.json()
+      })
       .then((data: { results: FragranceCatalogResult[] }) => {
         const filtered = (data.results ?? []).filter((r) => {
           if (ownedKeys.has(r.id)) return false
@@ -56,6 +59,7 @@ export function CrossRecommendations() {
         })
         setResults(filtered.slice(0, 3))
       })
+      .catch(() => setResults([]))
       .finally(() => setLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryToFetch])
